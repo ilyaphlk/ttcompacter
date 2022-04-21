@@ -15,6 +15,7 @@ class AdapterConfig(object):
     add_layer_norm_after_adapter: bool = True
     non_linearity: str = "swish"
     task_reduction_factor: int = 16
+    task_expansion_factor: int = 0
     add_adapter_in_feed_forward = True
     add_adapter_in_self_attention = True
     hidden_dim = 128
@@ -42,7 +43,7 @@ class AdapterConfig(object):
     # prefix-tuning parameters.
     prefix_dim = 100
     init_prefix_from_vocab = False 
-    kronecker_prod = False  
+    kronecker_prod = False
 
     # BitFit configuration.
     bitfit = False
@@ -51,6 +52,14 @@ class AdapterConfig(object):
     low_rank_adapters = False
     low_rank_w_init = "glorot-uniform"
     low_rank_rank = 1
+
+
+    # Tensor-Train adapters.
+    tensor_train_adapters = False
+    tt_rank = 8
+    tt_d = 3
+    tt_shape: tuple = None
+    freeze_cores = None  # either None, 'first' or 'last'
 
 
 ADAPTER_CONFIG_MAPPING = OrderedDict(

@@ -3,6 +3,35 @@ import torch.nn as nn
 from .adapter_utils import Activations
 from seq2seq.hypercomplex.layers import PHMLinear
 from .low_rank_layer import LowRankLinear
+from t3ensor.layers import TTLinear
+
+
+class TensorTrainAdapter(nn.Module):
+    def __init__(self, config):
+        self.config = config
+        self.input_dim = config.input_dim
+        self.down_sample_size = self.input_dim // config.reduction_factor
+        if config.expansion_factor > 0:
+            self.down_sample_size = self.input_dim * config.expansion_factor
+        self.activation = Activations(config.non_linearity.lower())
+
+        autoshapes = config.shape is None
+        self.down_sampler = TTLinear(
+            self.input_dim, self.down_sample_size,
+            d=config.tt_d, tt_rank=config.tt_rank,
+            shape=config.shape, autoshapes=autoshapes,
+        )
+        self.up_sampler = TTLinear(
+            self.down_sample_size, self.input_dim,
+            d=config.tt_d, tt_rank=config.tt_rank,
+            shape=config.shape, autoshapes=autoshapes,
+        )
+
+    def forward(self, x):
+        z = self.down_sampler(x)
+        z = self.activation(z)
+        output = self.up_sampler(z)
+        return output
 
 
 class LowRankAdapter(nn.Module):

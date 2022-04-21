@@ -20,6 +20,7 @@ class AdapterController(nn.Module):
         self.device = config.device
         self.shared_phm_rule = config.shared_phm_rule
         self.hypercomplex_adapters = config.hypercomplex_adapters
+        self.tensor_train_adapters = config.tensor_train_adapters
         self.adapters = self.construct_adapters(self.tasks)
         self.add_layer_norm_before_adapter = config.add_layer_norm_before_adapter
         self.add_layer_norm_after_adapter = config.add_layer_norm_after_adapter
@@ -43,6 +44,8 @@ class AdapterController(nn.Module):
                 self.adapters[task] = HyperComplexAdapter(self.config)
             elif self.low_rank_adapters:
                 self.adapters[task] = LowRankAdapter(self.config)
+            elif self.tensor_train_adapters:
+                self.adapters[task] = TensorTrainAdapter(self.config)
             else:
                 self.adapters[task] = Adapter(self.config)
         return self.adapters
@@ -78,6 +81,9 @@ class AdapterController(nn.Module):
                 if self.config.hypercomplex_adapters and not self.config.learn_phm:
                     if not "phm_rule" in name:
                         param.requires_grad = True
+                if self.config.tensor_train_adapters and self.config.freeze_cores is not None:
+                    # TODO freeze first/last layers
+                    raise NotImplementedError
                 else:
                     param.requires_grad = True
 
