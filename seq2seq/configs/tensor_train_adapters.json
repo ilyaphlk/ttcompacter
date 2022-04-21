@@ -39,7 +39,7 @@
 "compute_memory": true,
 
 "tensor_train_adapters": true,
-"tt_rank": 8,
-"tt_d": 3
+"tt_rank": 4,
+"tt_d": 5
 
 }
