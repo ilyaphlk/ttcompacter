@@ -3,7 +3,7 @@ import torch.nn as nn
 from .adapter_utils import Activations
 from seq2seq.hypercomplex.layers import PHMLinear
 from .low_rank_layer import LowRankLinear
-from t3ensor.layers import TTLinear
+from t3nsor.layers import TTLinear
 
 
 class TensorTrainAdapter(nn.Module):
