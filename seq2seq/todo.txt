@@ -1,0 +1,75 @@
+adapters/adapter_modeling.py:
+- Добавить свой TensorTrainAdapter
+
+
+adapters/tensor_train_linear.py:
+- Добавить свой TensorTrainLinear:
+   - конфиг должен уметь решейпиться под заданное число ядер - 30 минут
+   - как-то указывать, какие ядра фризятся, а какие нет?
+
+
+adapters/adapter_controller.py:
+. Добавить TensorTrainAdapter в места, где проверяется config.tensor_train_adapters==True
+
+
+adapters/adapter_configuration.py:
+. Добавить поле tensor_train_adapters = False
+. Добавить поля для конфигурации TensorTrainAdapter
+   - [инициализация? число ядер? переиспользование ядер?]
+
+- third_party/../modeling_t5.py:
+? Добавить обработку TTAdapter?
+
+- utils.py:
+? обработка слоёв внутри freeze_model_params
+? добавление множественного tasks в get_adapter_config
+
+- task_expansion_factor - добавить везде, где есть обработка task_reduction_factor
+
+
+**********
+Логирование:
+**********
+- run_seq2seq.py
+  - Добавить лог метрик в wandb - везде где есть logger.
+  	  - 
+      [Можно сделать с помощью run = wandb.init() if config.log_to_wandb else FakeWandb()]
+      [FakeWandb() def log(d): pass]
+  - Везде где есть trainer.log
+  ? Добавить измерение памяти по слоям
+  - run.config - не проходить по всем атрибутам, выделить основные
+  - config.experiment_name = 
+  - config.output_dir = f"outputs/{config.experiment_name}"
+
+
+************
+Выключение ядер:
+************
+
+t3nsor/layers.py:
+- Добавить аргумент, выключающий отдельные ядра
+
+initializers.py/matrix_with_random_cores:
+- Добавить проброску аргумента в конструктор TensorTrain
+
+t5_modeling.py (Или какой-то ещё файл):
+- Подсмотреть, как шерятся веса в компактере
+
+
+
+seq2seq.data:
+- Реализация пайплайна, в котором модель учится на данных вперемешку
+
+
+
+
+************
+Для себя:
+************
+Запустить TTLinear с разными аргументами, посмотреть, как он делает shape, что у него внутри
+
+
+************
+Идеи экспериментов:
+************
+- вставить промежуточные активации в перемножение ядер? Мотивация: поскольку раскладываем слой на несколько малых, есть возможность искуственно сделать модель глубже, что по наблюдениям (ссылка) делает модель экспрессивнее

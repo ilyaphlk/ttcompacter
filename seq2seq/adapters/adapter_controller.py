@@ -2,7 +2,7 @@
 layers of Adapters, and controls which adapter layer to use."""
 import os
 import torch.nn as nn
-from .adapter_modeling import Adapter, HyperComplexAdapter, LowRankAdapter
+from .adapter_modeling import Adapter, HyperComplexAdapter, LowRankAdapter, TensorTrainAdapter
 
 
 class AdapterController(nn.Module):
