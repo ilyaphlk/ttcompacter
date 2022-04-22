@@ -16,16 +16,16 @@ class TensorTrainAdapter(nn.Module):
             self.down_sample_size = self.input_dim * config.expansion_factor
         self.activation = Activations(config.non_linearity.lower())
 
-        autoshapes = config.shape is None
+        autoshapes = config.tt_shape is None
         self.down_sampler = TTLinear(
             self.input_dim, self.down_sample_size,
             d=config.tt_d, tt_rank=config.tt_rank,
-            shape=config.shape, autoshapes=autoshapes,
+            shape=config.tt_shape, autoshapes=autoshapes,
         )
         self.up_sampler = TTLinear(
             self.down_sample_size, self.input_dim,
             d=config.tt_d, tt_rank=config.tt_rank,
-            shape=config.shape, autoshapes=autoshapes,
+            shape=config.tt_shape, autoshapes=autoshapes,
         )
 
     def forward(self, x):
