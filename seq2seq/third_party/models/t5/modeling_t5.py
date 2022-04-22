@@ -306,6 +306,7 @@ class T5LayerFF(nn.Module):
         self.train_task_adapters = config.train_task_adapters and adapter_config.add_adapter_in_feed_forward
         if self.train_task_adapters:
             adapter_config.reduction_factor = adapter_config.task_reduction_factor
+            adapter_config.expansion_factor = adapter_config.task_expansion_factor
             self.adapter_controller = AdapterController(adapter_config)
         self.layer_norm = T5LayerNorm(config.d_model, eps=config.layer_norm_epsilon, adapter_config=adapter_config)
         self.dropout = nn.Dropout(config.dropout_rate)
@@ -548,6 +549,7 @@ class T5LayerSelfAttention(nn.Module):
         self.train_task_adapters = config.train_task_adapters and adapter_config.add_adapter_in_self_attention
         if self.train_task_adapters:
             adapter_config.reduction_factor = adapter_config.task_reduction_factor
+            adapter_config.expansion_factor = adapter_config.task_expansion_factor
             self.adapter_controller = AdapterController(adapter_config)
 
         self.dropout = nn.Dropout(config.dropout_rate)
