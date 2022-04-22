@@ -37,11 +37,11 @@ if is_torch_tpu_available():
     import torch_xla.debug.metrics as met
     import torch_xla.distributed.parallel_loader as pl
 
-logging.basicConfig(
-    filename='std.log',
-    filemode='w',
-    format='%(name)s - %(asctime)s - %(levelname)s - %(message)s'
-)
+# logging.basicConfig(
+#     filename='std.log',
+#     filemode='w',
+#     format='%(name)s - %(asctime)s - %(levelname)s - %(message)s'
+# )
 
 logger = logging.get_logger(__name__)
 
