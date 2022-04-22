@@ -43,7 +43,7 @@ from seq2seq.data import TaskDataCollatorForSeq2Seq
 from seq2seq.third_party.trainers import Seq2SeqTrainer
 from training_args import AdapterTrainingArguments
 from seq2seq.utils import modify_model_after_init, save_training_config 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from transformers import Seq2SeqTrainingArguments 
 from seq2seq.third_party.models import T5Config, T5ForConditionalGeneration
 from seq2seq.data import AutoPostProcessor
@@ -263,6 +263,8 @@ def main():
     else:
         model_args, data_args, training_args, adapter_args = parser.parse_args_into_dataclasses()
 
+    training_args.output_dir = f"outputs/{adapter_args.experiment_name}"
+
     # Detecting last checkpoint.
     last_checkpoint = None
     if os.path.isdir(training_args.output_dir) and training_args.do_train and not training_args.overwrite_output_dir:
@@ -286,9 +288,12 @@ def main():
     run = None
     run = wandb.init(project='TTAdapter', name=training_args.experiment_name, entity='i_pakhalko')
     for dclass in [model_args, data_args, training_args, adapter_args]:
-        attrs = [elem for elem in dir(dclass) if not elem.startswith('__')]
-        for attr in attrs:
+        #attrs = [elem for elem in dir(dclass) if not elem.startswith('__')]
+        attrs = [field.name for field in fields(dclass)]
+        for attr in fields(dclass):
             setattr(run.config, attr, getattr(dclass, attr))
+
+
 
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",

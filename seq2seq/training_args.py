@@ -1,6 +1,6 @@
 from seq2seq.adapters import ADAPTER_CONFIG_MAPPING
 from dataclasses import dataclass, field
-from typing import Optional, List
+from typing import Optional, List, Tuple
 
 
 @dataclass
@@ -120,4 +120,41 @@ class AdapterTrainingArguments:
     low_rank_rank: Optional[int] = field(
         default=1,
         metadata={"help": "Defines the rank of low-rank adapters."}
+    )
+
+    # Tensor-Train adapters
+
+    tensor_train_adapters: Optional[bool] = field(default=False, metadata={"help": "If set, uses the Tensor-Train adapters."})
+
+    tt_rank: Optional[int] = field(
+        default=8,
+        metadata={"help": "Defines the rank of tensor-train adapters."}
+    )
+
+    tt_d: Optional[int] = field(
+        default=3,
+        metadata={"help": "Defines the number of cores in tensor-train adapters."}
+    )
+
+    tt_shape: Optional[Tuple] = field(
+        default=None,
+        metadata={"help": "If set, explicitly defines the shape of a tensor-train linear layer"}
+    )
+
+    freeze_cores: Optional[str] = field(
+        default=None,
+        metadata={"help": "If set, defines the strategy to freeze TT-cores for fine-tuning across tasks"}
+    )
+
+    # additional fields
+
+    task_expansion_factor: Optional[int] = field(
+        default=0,
+        metadata={"help": "defines the expansion factor for "
+        "adapter layers. if set to zero, adapter operates in reduction mode."}
+    )
+
+    experiment_name: Optional[str] = field(
+        default="default_name",
+        metadata={"help": "defines the experiment name"}
     )

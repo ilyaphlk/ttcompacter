@@ -16,7 +16,6 @@
 "non_linearity": "gelu_new",
 "max_source_length": 128,
 "learning_rate": 3e-4,
-"output_dir": "outputs/ttrain_adapters",
 "split_validation_test": true,
 "task_name": "mrpc",
 "eval_dataset_name": "mrpc", 
@@ -38,7 +37,9 @@
 "compute_time": true,
 "compute_memory": true,
 
-"experiment_name": "debug_logging",
+"experiment_name": "debug_1",
+"output_dir": "outputs/debug_1",
+"logging_dir": "outputs/debug_1/trainer_logs",
 "tensor_train_adapters": true,
 "tt_rank": 4,
 "tt_d": 5

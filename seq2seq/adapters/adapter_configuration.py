@@ -61,6 +61,10 @@ class AdapterConfig(object):
     tt_shape: tuple = None
     freeze_cores = None  # either None, 'first' or 'last'
 
+    #other stuff
+    experiment_name = "default_name"
+
+
 
 ADAPTER_CONFIG_MAPPING = OrderedDict(
     [("adapter", AdapterConfig)])
