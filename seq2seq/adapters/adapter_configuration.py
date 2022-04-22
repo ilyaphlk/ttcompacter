@@ -62,7 +62,7 @@ class AdapterConfig(object):
     freeze_cores = None  # either None, 'first' or 'last'
 
     #other stuff
-    experiment_name = "default_name"
+    #experiment_name = "default_name"
 
 
 

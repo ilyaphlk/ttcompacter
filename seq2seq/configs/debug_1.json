@@ -37,7 +37,7 @@
 "compute_time": true,
 "compute_memory": true,
 
-"experiment_name": "debug_1",
+"experiment_name": "debug_1_",
 "output_dir": "outputs/debug_1",
 "logging_dir": "outputs/debug_1/trainer_logs",
 "tensor_train_adapters": true,

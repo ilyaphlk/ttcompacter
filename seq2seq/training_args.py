@@ -154,7 +154,7 @@ class AdapterTrainingArguments:
         "adapter layers. if set to zero, adapter operates in reduction mode."}
     )
 
-    experiment_name: Optional[str] = field(
-        default="default_name",
-        metadata={"help": "defines the experiment name"}
-    )
+    # experiment_name: Optional[str] = field(
+    #     default="default_name",
+    #     metadata={"help": "defines the experiment name"}
+    # )
