@@ -16,13 +16,13 @@ class AdapterConfig(object):
     non_linearity: str = "swish"
     task_reduction_factor: int = 16
     task_expansion_factor: int = 0
-    add_adapter_in_feed_forward = True
-    add_adapter_in_self_attention = True
-    hidden_dim = 128
+    add_adapter_in_feed_forward: bool = True
+    add_adapter_in_self_attention: bool = True
+    hidden_dim: int = 128
     task_adapter_layers_encoder = None
     task_adapter_layers_decoder = None
-    task_adapter_in_decoder = True
-    intrinsic_dim = 100
+    task_adapter_in_decoder: bool = True
+    intrinsic_dim: int = 100
     normalize_intrinsic_projections = False
     # This can be either random, or fastfood.
     intrinsic_projection = "random"
@@ -55,14 +55,11 @@ class AdapterConfig(object):
 
 
     # Tensor-Train adapters.
-    tensor_train_adapters = False
-    tt_rank = 8
-    tt_d = 3
+    tensor_train_adapters: bool = False
+    tt_rank: int = 8
+    tt_d: int = 3
     tt_shape: tuple = None
     freeze_cores = None  # either None, 'first' or 'last'
-
-    #other stuff
-    #experiment_name = "default_name"
 
 
 

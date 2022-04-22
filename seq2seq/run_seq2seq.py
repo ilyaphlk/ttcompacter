@@ -289,8 +289,8 @@ def main():
     run = wandb.init(project='TTAdapter', name=training_args.experiment_name, entity='i_pakhalko')
     for dclass in [model_args, data_args, training_args, adapter_args]:
         #attrs = [elem for elem in dir(dclass) if not elem.startswith('__')]
-        attrs = [field.name for field in fields(dclass)]
-        for attr in fields(dclass):
+        attrs = [elem.name for elem in fields(dclass)]
+        for attr in attrs:
             setattr(run.config, attr, getattr(dclass, attr))
 
 
