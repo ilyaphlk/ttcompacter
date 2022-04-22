@@ -20,12 +20,12 @@ class TensorTrainAdapter(nn.Module):
         self.down_sampler = TTLinear(
             self.input_dim, self.down_sample_size,
             d=config.tt_d, tt_rank=config.tt_rank,
-            shape=config.tt_shape, autoshapes=autoshapes,
+            shape=config.tt_shape, auto_shapes=autoshapes,
         )
         self.up_sampler = TTLinear(
             self.down_sample_size, self.input_dim,
             d=config.tt_d, tt_rank=config.tt_rank,
-            shape=config.tt_shape, autoshapes=autoshapes,
+            shape=config.tt_shape, auto_shapes=autoshapes,
         )
 
     def forward(self, x):
