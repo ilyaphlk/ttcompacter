@@ -99,7 +99,7 @@ class TrainingArguments(Seq2SeqTrainingArguments):
     compute_time: Optional[bool] = field(default=False, metadata={"help": "If set measures the time."})
     compute_memory: Optional[bool] = field(default=False, metadata={"help": "if set, measures the memory"})
     prefix_length: Optional[int] = field(default=100, metadata={"help": "Defines the length for prefix tuning."})
-    experiment_name: Optional[str] = field(default="no_name", metadata={"help": "Name used for experimentation."})
+    experiment_name: Optional[str] = field(default="default_name", metadata={"help": "Name used for experimentation."})
 
 @dataclass
 class ModelArguments:
@@ -263,7 +263,7 @@ def main():
     else:
         model_args, data_args, training_args, adapter_args = parser.parse_args_into_dataclasses()
 
-    training_args.output_dir = f"outputs/{adapter_args.experiment_name}"
+    training_args.output_dir = f"outputs/{training_args.experiment_name}"
 
     # Detecting last checkpoint.
     last_checkpoint = None
