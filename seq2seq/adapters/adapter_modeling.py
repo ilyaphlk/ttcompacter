@@ -8,6 +8,7 @@ from t3nsor.layers import TTLinear
 
 class TensorTrainAdapter(nn.Module):
     def __init__(self, config):
+        super().__init__()
         self.config = config
         self.input_dim = config.input_dim
         self.down_sample_size = self.input_dim // config.reduction_factor

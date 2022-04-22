@@ -37,6 +37,7 @@
 "compute_time": true,
 "compute_memory": true,
 
+"report_to": "wandb",
 "experiment_name": "debug_1_",
 "output_dir": "outputs/debug_1",
 "logging_dir": "outputs/debug_1/trainer_logs",
