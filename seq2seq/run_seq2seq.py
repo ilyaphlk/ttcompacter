@@ -25,6 +25,7 @@ os.environ['MKL_SERVICE_FORCE_INTEL'] = '1'
 import sys
 import subprocess
 from typing import Optional, List
+import wandb
 
 from datasets import load_dataset, load_metric, concatenate_datasets
 import transformers
@@ -46,6 +47,12 @@ from dataclasses import dataclass, field
 from transformers import Seq2SeqTrainingArguments 
 from seq2seq.third_party.models import T5Config, T5ForConditionalGeneration
 from seq2seq.data import AutoPostProcessor
+
+logging.basicConfig(
+    filename='std.log',
+    filemode='w',
+    format='%(name)s - %(asctime)s - %(levelname)s - %(message)s'
+)
 
 logger = logging.getLogger(__name__)
 
@@ -92,6 +99,7 @@ class TrainingArguments(Seq2SeqTrainingArguments):
     compute_time: Optional[bool] = field(default=False, metadata={"help": "If set measures the time."})
     compute_memory: Optional[bool] = field(default=False, metadata={"help": "if set, measures the memory"})
     prefix_length: Optional[int] = field(default=100, metadata={"help": "Defines the length for prefix tuning."})
+    experiment_name: Optional[str] = field(default="no_name", metadata={"help": "Name used for experimentation."})
 
 @dataclass
 class ModelArguments:
@@ -275,6 +283,13 @@ def main():
             )
 
     # Setup logging
+    run = None
+    run = wandb.init(project='TTAdapter', name=training_args.experiment_name, entity='i_pakhalko')
+    for dclass in [model_args, data_args, training_args, adapter_args]:
+        attrs = [elem for elem in dir(dclass) if not elem.startswith('__')]
+        for attr in attrs:
+            setattr(run.config, attr, getattr(dclass, attr))
+
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
         datefmt="%m/%d/%Y %H:%M:%S",
@@ -341,7 +356,7 @@ def main():
         adapter_config=adapter_config
     )
     model.resize_token_embeddings(len(tokenizer))
-    model = modify_model_after_init(model, training_args, adapter_args)
+    model = modify_model_after_init(model, training_args, adapter_args, run=run)
 
     data_args.dataset_name = [data_args.task_name]
     data_args.eval_dataset_name = [data_args.eval_dataset_name]
@@ -482,7 +497,8 @@ def main():
         tokenizer=tokenizer,
         data_collator=data_collator,
         compute_metrics=compute_metrics if training_args.predict_with_generate else None,
-        evaluation_metrics = TASK_TO_METRICS[data_args.dataset_name[0]]
+        evaluation_metrics = TASK_TO_METRICS[data_args.dataset_name[0]],
+        run=run
     )
     # Saves training config. 
     if trainer.is_world_process_zero():
@@ -519,7 +535,9 @@ def main():
         train_metrics["train_samples"] = min(max_train_samples, len(train_dataset))
         trainer.log_metrics("train", train_metrics)
         trainer.save_metrics("train", train_metrics)
+        run.log(train_metrics)
         trainer.save_state()
+
 
     if torch.cuda.is_available() and training_args.compute_memory:
         peak_memory = (torch.cuda.max_memory_allocated() / 1024 ** 2)/1000
@@ -532,6 +550,7 @@ def main():
     if training_args.compute_memory or training_args.compute_time:
         print(performance_metrics)
         trainer.save_metrics("performance", performance_metrics)
+        run.log(performance_metrics)
     
     # Evaluation
     results = {}
@@ -543,6 +562,7 @@ def main():
             )
             trainer.log_metrics("eval", metrics)
             trainer.save_metrics("eval", metrics)
+            run.log(metrics)
 
     # Test
     if training_args.do_test:
@@ -554,6 +574,7 @@ def main():
             )
             trainer.log_metrics("test", metrics)
             trainer.save_metrics("test", metrics)
+            run.log(metrics)
     return results
 
 

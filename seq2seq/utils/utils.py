@@ -9,6 +9,13 @@ from seq2seq.adapters import (AutoAdapterConfig, AdapterController, Adapter, Hyp
 from projections.intrinsic import intrinsic_dimension, intrinsic_dimension_said
 from seq2seq.third_party.models.t5 import T5LayerNorm
 
+
+logging.basicConfig(
+    filename='std.log',
+    filemode='w',
+    format='%(name)s - %(asctime)s - %(levelname)s - %(message)s'
+)
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
@@ -178,7 +185,7 @@ def pad_punctuation(text):
    return text
 
 
-def modify_model_after_init(model, training_args, adapter_args):
+def modify_model_after_init(model, training_args, adapter_args, run=None):
     # Freezes model parameters.
     freeze_model_params(model, adapter_args)
     if adapter_args.intrinsic_model:
@@ -221,6 +228,19 @@ def modify_model_after_init(model, training_args, adapter_args):
         logger.info("Total trainable bias params %s", total_trainable_bias_params_percent)
         logger.info("Total trainable layernorm params %s", total_trainable_layernorm_params_percent)
         logger.info("Total lm_head params %s", total_trainable_lm_head_params_percent)
+
+        if run is not None:
+            run.config.total_params = total_params
+            run.config.t5_base_params = t5_base_params
+            run.config.total_trainable_params = total_trainable_params
+            run.config.total_trainable_bias_params = total_trainable_bias_params
+            run.config.total_trainable_layernorm_params = total_trainable_layernorm_params
+            run.config.total_params_ratio = total_params_ratio
+            run.config.total_trainable_params_percent = total_trainable_params_percent
+            run.config.total_trainable_bias_params_percent = total_trainable_bias_params_percent
+            run.config.total_trainable_layernorm_params_percent = total_trainable_layernorm_params_percent
+            run.config.total_trainable_lm_head_params_percent = total_trainable_lm_head_params_percent
+
     return model
 
 def save_json(filepath, dictionary):

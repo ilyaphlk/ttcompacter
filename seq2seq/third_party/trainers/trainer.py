@@ -37,16 +37,23 @@ if is_torch_tpu_available():
     import torch_xla.debug.metrics as met
     import torch_xla.distributed.parallel_loader as pl
 
+logging.basicConfig(
+    filename='std.log',
+    filemode='w',
+    format='%(name)s - %(asctime)s - %(levelname)s - %(message)s'
+)
+
 logger = logging.get_logger(__name__)
 
 class BaseTrainer(Trainer):
-    def __init__(self, evaluation_metrics=[], data_info=None, *args, **kwargs):
+    def __init__(self, evaluation_metrics=[], data_info=None, run=None, *args, **kwargs):
         """When doing evaluation, it computes average of list of metrics 
         given in evaluation_metrics and adds it to the dictionary of results.
         Trainer class then use this average metric to save the best model."""
         super().__init__(*args, **kwargs)
         self.evaluation_metrics = evaluation_metrics 
         self.data_info = data_info
+        self.run = run
 
     def get_data_info(self, metric_key_prefix):
         """Returns the data information required to make the predictions/labels
@@ -102,6 +109,7 @@ class BaseTrainer(Trainer):
            output.metrics.update({metric_key_prefix+'_average_metrics': np.mean(selected_metrics)})         
     
         self.log(output.metrics)
+        self.run.log(output.metrics)
 
         if self.args.tpu_metrics_debug or self.args.debug:
             # tpu-comment: Logging debug metrics for PyTorch/XLA (compile, execute times, ops, etc.)
