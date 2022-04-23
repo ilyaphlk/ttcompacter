@@ -109,7 +109,7 @@ class BaseTrainer(Trainer):
            output.metrics.update({metric_key_prefix+'_average_metrics': np.mean(selected_metrics)})         
     
         self.log(output.metrics)
-        self.run.log(output.metrics)
+        #self.run.log(output.metrics)
 
         if self.args.tpu_metrics_debug or self.args.debug:
             # tpu-comment: Logging debug metrics for PyTorch/XLA (compile, execute times, ops, etc.)

@@ -60,10 +60,10 @@ def run_command(command):
     output = subprocess.getoutput(command)
     return output
 
-
-TASK_TO_METRICS = {"mrpc": ["accuracy", "f1"],
-                  "cola": ['matthews_correlation'],
-                  "stsb": ['pearson', 'spearmanr'],
+# low resource RTE, MRPC, STS-B, CoLA, COPA, WiC, CB, BoolQ, MultiRC
+TASK_TO_METRICS = {"mrpc": ["accuracy", "f1"], #
+                  "cola": ['matthews_correlation'], #
+                  "stsb": ['pearson', 'spearmanr'], #
                   'sst2': ['accuracy'],
                   "mnli": ["accuracy"],
                   "mnli_mismatched": ["accuracy"],
@@ -72,12 +72,12 @@ TASK_TO_METRICS = {"mrpc": ["accuracy", "f1"],
                   "rte": ["accuracy"],
                   "wnli": ["accuracy"],
                   "qqp": ["accuracy", "f1"],
-                  "superglue-boolq": ["accuracy"],
-                  "superglue-rte": ["accuracy"],
-                  "superglue-cb": ["f1_multiclass", "accuracy"],
-                  "superglue-copa": ["accuracy"],
-                  "superglue-multirc": ["f1", "em"],
-                  "superglue-wic": ["accuracy"],
+                  "superglue-boolq": ["accuracy"], #
+                  "superglue-rte": ["accuracy"], #
+                  "superglue-cb": ["f1_multiclass", "accuracy"], #
+                  "superglue-copa": ["accuracy"], #
+                  "superglue-multirc": ["f1", "em"], #
+                  "superglue-wic": ["accuracy"], #
                   "superglue-wsc.fixed": ["accuracy"],
                   "superglue-record": ["f1", "em"]
          }
@@ -287,13 +287,25 @@ def main():
     # Setup logging
     run = None
     run = wandb.init(project='TTAdapter', name=training_args.experiment_name, entity='i_pakhalko')
-    for dclass in [model_args, data_args, training_args, adapter_args]:
-        #attrs = [elem for elem in dir(dclass) if not elem.startswith('__')]
-        attrs = [elem.name for elem in fields(dclass)]
-        for attr in attrs:
-            setattr(run.config, attr, getattr(dclass, attr))
+    # for dclass in [model_args, data_args, training_args, adapter_args]:
+    #     attrs = [elem.name for elem in fields(dclass)]
+    #     for attr in attrs:
+    #         setattr(run.config, attr, getattr(dclass, attr))
 
-
+    run.config.task_name = data_args.task_name
+    run.config.max_source_length = data_args.max_source_length
+    run.config.experiment_name = training_args.experiment_name
+    run.config.num_train_epochs = training_args.num_train_epochs
+    run.config.learning_rate = training_args.learning_rate
+    run.config.warmup_steps = training_args.warmup_steps
+    run.config.batch_size = training_args.per_device_train_batch_size
+    run.config.non_linearity = adapter_args.non_linearity
+    run.config.task_reduction_factor = adapter_args.task_reduction_factor
+    run.config.task_expansion_factor = adapter_args.task_expansion_factor
+    run.config.tensor_train_adapters = adapter_args.tensor_train_adapters
+    run.config.tt_rank = adapter_args.tt_rank
+    run.config.tt_d = adapter_args.tt_d
+    #run.config. = 
 
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
@@ -361,7 +373,11 @@ def main():
         adapter_config=adapter_config
     )
     model.resize_token_embeddings(len(tokenizer))
-    model = modify_model_after_init(model, training_args, adapter_args, run=run)
+    model, model_info = modify_model_after_init(model, training_args, adapter_args)
+    attrs = [elem.name for elem in fields(model_info)]
+    for elem in attrs:
+        setattr(run.config, elem, getattr(model_info, elem))
+
 
     data_args.dataset_name = [data_args.task_name]
     data_args.eval_dataset_name = [data_args.eval_dataset_name]

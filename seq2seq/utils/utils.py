@@ -1,7 +1,7 @@
 import os 
 import regex as re
 import logging
-from dataclasses import fields
+from dataclasses import dataclass, fields
 import torch.nn as nn
 import json
 
@@ -184,6 +184,19 @@ def pad_punctuation(text):
    text = re.sub(r'\s+', ' ', text)
    return text
 
+@dataclass
+class ModelInfo():
+    total_params: int = None
+    t5_base_params: int = None
+    total_trainable_params: int = None
+    total_trainable_bias_params: int = None
+    total_trainable_layernorm_params: int = None
+    total_params_ratio: float = None
+    total_trainable_params_percent: float = None
+    total_trainable_bias_params_percent: float = None
+    total_trainable_layernorm_params_percent: float = None
+    total_trainable_lm_head_params_percent: float = None
+
 
 def modify_model_after_init(model, training_args, adapter_args, run=None):
     # Freezes model parameters.
@@ -229,19 +242,19 @@ def modify_model_after_init(model, training_args, adapter_args, run=None):
         logger.info("Total trainable layernorm params %s", total_trainable_layernorm_params_percent)
         logger.info("Total lm_head params %s", total_trainable_lm_head_params_percent)
 
-        if run is not None:
-            run.config.total_params = total_params
-            run.config.t5_base_params = t5_base_params
-            run.config.total_trainable_params = total_trainable_params
-            run.config.total_trainable_bias_params = total_trainable_bias_params
-            run.config.total_trainable_layernorm_params = total_trainable_layernorm_params
-            run.config.total_params_ratio = total_params_ratio
-            run.config.total_trainable_params_percent = total_trainable_params_percent
-            run.config.total_trainable_bias_params_percent = total_trainable_bias_params_percent
-            run.config.total_trainable_layernorm_params_percent = total_trainable_layernorm_params_percent
-            run.config.total_trainable_lm_head_params_percent = total_trainable_lm_head_params_percent
+        model_info = ModelInfo()
+        model_info.total_params = total_params
+        model_info.t5_base_params = t5_base_params
+        model_info.total_trainable_params = total_trainable_params
+        model_info.total_trainable_bias_params = total_trainable_bias_params
+        model_info.total_trainable_layernorm_params = total_trainable_layernorm_params
+        model_info.total_params_ratio = total_params_ratio
+        model_info.total_trainable_params_percent = total_trainable_params_percent
+        model_info.total_trainable_bias_params_percent = total_trainable_bias_params_percent
+        model_info.total_trainable_layernorm_params_percent = total_trainable_layernorm_params_percent
+        model_info.total_trainable_lm_head_params_percent = total_trainable_lm_head_params_percent
 
-    return model
+    return model, model_info
 
 def save_json(filepath, dictionary):
    with open(filepath, "w") as outfile:
