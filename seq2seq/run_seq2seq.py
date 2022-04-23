@@ -374,9 +374,11 @@ def main():
     )
     model.resize_token_embeddings(len(tokenizer))
     model, model_info = modify_model_after_init(model, training_args, adapter_args)
-    attrs = [elem.name for elem in fields(model_info)]
-    for elem in attrs:
-        setattr(run.config, elem, getattr(model_info, elem))
+
+    if model_info is not None:
+        attrs = [elem.name for elem in fields(model_info)]
+        for elem in attrs:
+            setattr(run.config, elem, getattr(model_info, elem))
 
 
     data_args.dataset_name = [data_args.task_name]

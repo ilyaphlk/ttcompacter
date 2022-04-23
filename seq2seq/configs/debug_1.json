@@ -22,6 +22,7 @@
 "compute_time": true,
 "compute_memory": true,
 "report_to": "wandb",
+"print_num_parameters": true,
 
 "add_layer_norm_before_adapter": false, 
 "add_layer_norm_after_adapter": false,
@@ -45,5 +46,4 @@
 "tensor_train_adapters": true,
 "tt_rank": 4,
 "tt_d": 5
-
 }

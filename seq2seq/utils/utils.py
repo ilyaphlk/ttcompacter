@@ -215,6 +215,8 @@ def modify_model_after_init(model, training_args, adapter_args, run=None):
     for n, p in model.named_parameters():
         if p.requires_grad:
             print("inside n ", n)
+
+    model_info = None
     if training_args.print_num_parameters:
         for name, param in model.named_parameters():
             if param.requires_grad:
