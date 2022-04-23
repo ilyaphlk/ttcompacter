@@ -31,9 +31,9 @@
 "overwrite_output_dir": true,
 
 "experiment_name": "debug_1_",
-"task_name": "qnli",
-"eval_dataset_name": "qnli", 
-"test_dataset_name": "qnli",
+"task_name": "sst2",
+"eval_dataset_name": "sst2", 
+"test_dataset_name": "sst2",
 "num_train_epochs": 2,
 "learning_rate": 3e-4,
 "warmup_steps": 500,
