@@ -286,7 +286,7 @@ def main():
 
     # Setup logging
     run = None
-    wandb.login()
+    #wandb.login()
     run = wandb.init(project='TTAdapter', name=training_args.experiment_name, entity='i_pakhalko')
     # for dclass in [model_args, data_args, training_args, adapter_args]:
     #     attrs = [elem.name for elem in fields(dclass)]
