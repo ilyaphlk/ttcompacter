@@ -18,7 +18,6 @@
 "adapter_config_name": "adapter",
 "train_task_adapters": true,
 
-"logging_dir": "outputs/debug_1/trainer_logs",
 "output_dir": "outputs/debug_1",
 "compute_time": true,
 "compute_memory": true,
@@ -30,11 +29,11 @@
 "unfreeze_layer_norms": true,
 "overwrite_output_dir": true,
 
-"experiment_name": "debug_1_",
-"task_name": "rte",
-"eval_dataset_name": "rte", 
-"test_dataset_name": "rte",
-"num_train_epochs": 2,
+"experiment_name": "expansion_8",
+"task_name": "cola",
+"eval_dataset_name": "cola", 
+"test_dataset_name": "cola",
+"num_train_epochs": 20,
 "learning_rate": 3e-4,
 "warmup_steps": 500,
 "per_device_train_batch_size": 50,
@@ -42,7 +41,7 @@
 "max_source_length": 128,
 "non_linearity": "gelu_new",
 "task_reduction_factor": 32,
-"task_expansion_factor": 0,
+"task_expansion_factor": 8,
 "tensor_train_adapters": true,
 "tt_rank": 8,
 "tt_d": 3

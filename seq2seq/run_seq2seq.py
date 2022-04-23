@@ -263,7 +263,7 @@ def main():
     else:
         model_args, data_args, training_args, adapter_args = parser.parse_args_into_dataclasses()
 
-    training_args.output_dir = f"outputs/{training_args.experiment_name}"
+    training_args.output_dir = f"outputs/{data_args.task_name}/{training_args.experiment_name}"
 
     # Detecting last checkpoint.
     last_checkpoint = None
