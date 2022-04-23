@@ -69,8 +69,8 @@ TASK_TO_METRICS = {"mrpc": ["accuracy", "f1"], #
                   "mnli_mismatched": ["accuracy"],
                   "mnli_matched": ["accuracy"],
                   "qnli": ["accuracy"],
-                  "rte": ["accuracy"],
-                  "wnli": ["accuracy"],
+                  "rte": ["accuracy"], #
+                  "wnli": ["accuracy"], #
                   "qqp": ["accuracy", "f1"],
                   "superglue-boolq": ["accuracy"], #
                   "superglue-rte": ["accuracy"], #
