@@ -185,7 +185,7 @@ def pad_punctuation(text):
    return text
 
 @dataclass
-class ModelInfo():
+class ModelInfo:
     total_params: int = None
     t5_base_params: int = None
     total_trainable_params: int = None
