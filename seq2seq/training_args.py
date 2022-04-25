@@ -136,7 +136,7 @@ class AdapterTrainingArguments:
         metadata={"help": "Defines the number of cores in tensor-train adapters."}
     )
 
-    tt_shape: Optional[Tuple] = field(
+    tt_shape: Optional[List[List[int]]] = field(
         default=None,
         metadata={"help": "If set, explicitly defines the shape of a tensor-train linear layer"}
     )

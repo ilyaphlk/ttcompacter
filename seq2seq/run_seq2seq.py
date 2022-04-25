@@ -60,7 +60,7 @@ def run_command(command):
     output = subprocess.getoutput(command)
     return output
 
-# low resource RTE, MRPC, STS-B, CoLA, COPA, WiC, CB, BoolQ, MultiRC
+# low resource: RTE, MRPC, STS-B, CoLA, COPA, WiC, CB, BoolQ, MultiRC
 TASK_TO_METRICS = {"mrpc": ["accuracy", "f1"], #
                   "cola": ['matthews_correlation'], #
                   "stsb": ['pearson', 'spearmanr'], #
@@ -355,6 +355,8 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
+    run.config.input_dim = config.d_model
+
     config.train_task_adapters = adapter_args.train_task_adapters
     config.prefix_tuning = adapter_args.prefix_tuning
     adapter_config = get_adapter_config(adapter_args, data_args, training_args, config)
