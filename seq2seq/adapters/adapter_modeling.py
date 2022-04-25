@@ -29,6 +29,7 @@ class TensorTrainAdapter(nn.Module):
             d=config.tt_d, tt_rank=config.tt_rank,
             shape=upsample_shape, auto_shapes=autoshapes,
         )
+        print(upsample_shape)
 
     def forward(self, x):
         z = self.down_sampler(x)

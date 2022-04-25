@@ -59,7 +59,7 @@ class AdapterConfig(object):
     tensor_train_adapters: bool = False
     tt_rank: int = 8
     tt_d: int = 3
-    tt_shape: List[List[int]] = None
+    tt_shape: = None
     freeze_cores = None  # either None, 'first' or 'last'
 
 
