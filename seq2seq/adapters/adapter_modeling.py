@@ -23,7 +23,7 @@ class TensorTrainAdapter(nn.Module):
             shape=config.tt_shape, auto_shapes=autoshapes,
         )
         self.tt_shape = self.down_sampler.shape
-        upsample_shape = [reversed(self.tt_shape[1]), reversed(self.tt_shape[0])]
+        upsample_shape = [list(reversed(self.tt_shape[1])), list(reversed(self.tt_shape[0]))]
         self.up_sampler = TTLinear(
             self.down_sample_size, self.input_dim,
             d=config.tt_d, tt_rank=config.tt_rank,
