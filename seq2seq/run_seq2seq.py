@@ -307,7 +307,7 @@ def main():
     run.config.tensor_train_adapters = adapter_args.tensor_train_adapters
     run.config.tt_rank = adapter_args.tt_rank
     run.config.tt_d = adapter_args.tt_d
-    #run.config. = 
+    run.config.tt_shape = adapter_args.tt_shape
 
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
@@ -355,7 +355,6 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
-    run.config.input_dim = config.d_model
 
     config.train_task_adapters = adapter_args.train_task_adapters
     config.prefix_tuning = adapter_args.prefix_tuning
@@ -383,6 +382,7 @@ def main():
         attrs = [elem.name for elem in fields(model_info)]
         for elem in attrs:
             setattr(run.config, elem, getattr(model_info, elem))
+    run.config.input_dim = model.config.d_model
 
 
     data_args.dataset_name = [data_args.task_name]
