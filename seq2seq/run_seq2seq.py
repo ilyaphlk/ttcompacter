@@ -324,7 +324,9 @@ def main():
     # Set the verbosity to info of the Transformers logger (on main process only):
     if is_main_process(training_args.local_rank):
         transformers.utils.logging.set_verbosity_info()
+    logger.info(f"adapter shape: {adapter_args.tt_shape}")
     logger.info("Training/evaluation parameters %s", training_args)
+
 
     # Set seed before initializing model.
     set_seed(training_args.seed)
