@@ -46,5 +46,6 @@
 "tensor_train_adapters": true,
 "tt_rank": 2,
 "tt_d": 3,
-"reverse_out_shape": false
+"reverse_out_shape": true,
+"factorize_smaller_dim": true
 }
