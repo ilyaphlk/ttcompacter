@@ -146,6 +146,11 @@ class AdapterTrainingArguments:
         metadata={"help": "Whether or not to reverse out_dim quantization for Tensor Train Linear layer"}
     )
 
+    factorize_smaller_dim: bool = field(
+        default=True,
+        metadata={"help": "Whether or not to factorize smaller dim for Tensor Train Linear layer"}
+    )
+
     freeze_cores: Optional[str] = field(
         default=None,
         metadata={"help": "If set, defines the strategy to freeze TT-cores for fine-tuning across tasks"}
