@@ -308,6 +308,8 @@ def main():
     run.config.tt_rank = adapter_args.tt_rank
     run.config.tt_d = adapter_args.tt_d
     run.config.tt_shape = adapter_args.tt_shape
+    run.config.reverse_out_shape = adapter_args.reverse_out_shape
+    run.config.factorize_smaller_dim = adapter_args.factorize_smaller_dim
 
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
