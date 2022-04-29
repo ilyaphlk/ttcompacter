@@ -141,6 +141,11 @@ class AdapterTrainingArguments:
         metadata={"help": "If set, explicitly defines the shape of a tensor-train linear layer"}
     )
 
+    reverse_out_shape: bool = field(
+        default=False,
+        metadata={"help": "Whether or not to reverse out_dim quantization for Tensor Train Linear layer"}
+    )
+
     freeze_cores: Optional[str] = field(
         default=None,
         metadata={"help": "If set, defines the strategy to freeze TT-cores for fine-tuning across tasks"}

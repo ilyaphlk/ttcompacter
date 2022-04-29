@@ -60,6 +60,7 @@ class AdapterConfig(object):
     tt_rank: int = 8
     tt_d: int = 3
     tt_shape: List[List[int]] = None
+    reverse_out_shape: bool = False
     freeze_cores = None  # either None, 'first' or 'last'
 
 
