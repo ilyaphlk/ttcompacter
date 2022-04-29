@@ -225,6 +225,7 @@ def modify_model_after_init(model, training_args, adapter_args, run=None):
             if param.requires_grad:
                 logger.info("##### Parameter name %s", name)
         total_lm_head_params = sum(p.numel() for p in model.lm_head.parameters())
+        total_trainable_lm_head_params = sum(p.numel() for p in model.lm_head.parameters() if p.requires_grad)
         total_trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
         total_trainable_bias_params = sum(p.numel() for n, p in model.named_parameters() if p.requires_grad and n.endswith(".b"))
         total_trainable_layernorm_params = sum(p.numel() for n, p in model.named_parameters() if p.requires_grad and ".layer_norm.weight" in n)
@@ -239,7 +240,7 @@ def modify_model_after_init(model, training_args, adapter_args, run=None):
         total_trainable_params_percent =(total_trainable_params/t5_base_params)*100
         total_trainable_bias_params_percent =(total_trainable_bias_params/total_trainable_params)*100
         total_trainable_layernorm_params_percent =(total_trainable_layernorm_params/total_trainable_params)*100
-        total_trainable_lm_head_params_percent =(total_lm_head_params/t5_base_params)*100
+        total_trainable_lm_head_params_percent =(total_trainable_lm_head_params/t5_base_params)*100
         logger.info("For adapters/prompt-tuning, total params %s", total_params_ratio)
         logger.info("For intrinsic, total params %s", total_params/t5_base_params)
         logger.info("Total trainable params %s", total_trainable_params_percent)
