@@ -2,6 +2,7 @@
 
 from collections import OrderedDict
 from dataclasses import dataclass
+from typing import List
 
 import torch.nn as nn
 
@@ -58,7 +59,9 @@ class AdapterConfig(object):
     tensor_train_adapters: bool = False
     tt_rank: int = 8
     tt_d: int = 3
-    tt_shape: tuple = None
+    tt_shape: List[List[int]] = None
+    reverse_out_shape: bool = False
+    factorize_smaller_dim: bool = True
     freeze_cores = None  # either None, 'first' or 'last'
 
 

@@ -21,12 +21,19 @@ class TensorTrainAdapter(nn.Module):
             self.input_dim, self.down_sample_size,
             d=config.tt_d, tt_rank=config.tt_rank,
             shape=config.tt_shape, auto_shapes=autoshapes,
+            reverse_out_shape=config.reverse_out_shape,
+            factorize_smaller_dim=config.factorize_smaller_dim
         )
+        self.tt_shape = self.down_sampler.shape
+        upsample_shape = [list(reversed(self.tt_shape[1])), list(reversed(self.tt_shape[0]))]
         self.up_sampler = TTLinear(
             self.down_sample_size, self.input_dim,
             d=config.tt_d, tt_rank=config.tt_rank,
-            shape=config.tt_shape, auto_shapes=autoshapes,
+            shape=upsample_shape, auto_shapes=autoshapes,
+            reverse_out_shape=config.reverse_out_shape,
+            factorize_smaller_dim=config.factorize_smaller_dim
         )
+
 
     def forward(self, x):
         z = self.down_sampler(x)

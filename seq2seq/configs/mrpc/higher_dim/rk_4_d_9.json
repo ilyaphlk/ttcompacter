@@ -1,6 +1,6 @@
 {
-"do_train": false,
-"do_eval": false,
+"do_train": true,
+"do_eval": true,
 "do_test": true,
 "save_steps": 1000,
 "model_name_or_path": "t5-base",
@@ -18,7 +18,6 @@
 "adapter_config_name": "adapter",
 "train_task_adapters": true,
 
-"logging_dir": "outputs/debug_1/trainer_logs",
 "output_dir": "outputs/debug_1",
 "compute_time": true,
 "compute_memory": true,
@@ -30,22 +29,20 @@
 "unfreeze_layer_norms": true,
 "overwrite_output_dir": true,
 
-"experiment_name": "debug_2",
+"experiment_name": "rk_4_d_9",
 "task_name": "mrpc",
 "eval_dataset_name": "mrpc", 
 "test_dataset_name": "mrpc",
-"num_train_epochs": 1,
+"num_train_epochs": 20,
 "learning_rate": 3e-4,
 "warmup_steps": 500,
-"per_device_train_batch_size": 50,
+"per_device_train_batch_size": 100,
 "per_device_eval_batch_size": 50,
 "max_source_length": 128,
 "non_linearity": "gelu_new",
 "task_reduction_factor": 32,
 "task_expansion_factor": 0,
 "tensor_train_adapters": true,
-"tt_rank": 2,
-"tt_d": 3,
-"reverse_out_shape": true,
-"factorize_smaller_dim": false
+"tt_rank": 4,
+"tt_d": 9
 }

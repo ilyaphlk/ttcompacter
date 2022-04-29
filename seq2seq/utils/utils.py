@@ -48,6 +48,9 @@ def get_adapter_config(adapter_args, data_args, training_args, config):
                 logger.warning(f"({adapter_config.__class__.__name__}) doesn't have a `{p}` attribute")
         adapter_config.device = training_args.device
         adapter_config.output_dir = training_args.output_dir
+        if adapter_config.tt_shape is not None:
+            adapter_config.tt_shape = list(adapter_config.tt_shape)
+            adapter_config.tt_shape[0], adapter_config.tt_shape[1] = list(adapter_config.tt_shape[0]), list(adapter_config.tt_shape[1])
     else:
         adapter_config = None
     return adapter_config

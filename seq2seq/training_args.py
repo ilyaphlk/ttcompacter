@@ -136,9 +136,19 @@ class AdapterTrainingArguments:
         metadata={"help": "Defines the number of cores in tensor-train adapters."}
     )
 
-    tt_shape: Optional[Tuple] = field(
+    tt_shape: Optional[List[List[int]]] = field(
         default=None,
         metadata={"help": "If set, explicitly defines the shape of a tensor-train linear layer"}
+    )
+
+    reverse_out_shape: bool = field(
+        default=False,
+        metadata={"help": "Whether or not to reverse out_dim quantization for Tensor Train Linear layer"}
+    )
+
+    factorize_smaller_dim: bool = field(
+        default=True,
+        metadata={"help": "Whether or not to factorize smaller dim for Tensor Train Linear layer"}
     )
 
     freeze_cores: Optional[str] = field(
@@ -153,8 +163,3 @@ class AdapterTrainingArguments:
         metadata={"help": "defines the expansion factor for "
         "adapter layers. if set to zero, adapter operates in reduction mode."}
     )
-
-    # experiment_name: Optional[str] = field(
-    #     default="default_name",
-    #     metadata={"help": "defines the experiment name"}
-    # )
