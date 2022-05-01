@@ -30,6 +30,7 @@
 "unfreeze_layer_norms": true,
 "overwrite_output_dir": true,
 
+"project_name": "tt_debug",
 "experiment_name": "debug_1",
 "task_name": "mrpc",
 "eval_dataset_name": "mrpc", 
