@@ -310,6 +310,7 @@ def main():
     run.config.tt_shape = adapter_args.tt_shape
     run.config.reverse_out_shape = adapter_args.reverse_out_shape
     run.config.factorize_smaller_dim = adapter_args.factorize_smaller_dim
+    run.config.cores_nonlinearity = adapter_args.cores_nonlinearity
 
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",

@@ -151,6 +151,11 @@ class AdapterTrainingArguments:
         metadata={"help": "Whether or not to factorize smaller dim for Tensor Train Linear layer"}
     )
 
+    cores_nonlinearity: str = field(
+        default=None,
+        metadata={"help": "Type of nonlinearity to add between Tensor Train cores"}
+    )
+
     freeze_cores: Optional[str] = field(
         default=None,
         metadata={"help": "If set, defines the strategy to freeze TT-cores for fine-tuning across tasks"}
