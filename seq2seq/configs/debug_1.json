@@ -1,6 +1,6 @@
 {
-"do_train": false,
-"do_eval": false,
+"do_train": true,
+"do_eval": true,
 "do_test": true,
 "save_steps": 1000,
 "model_name_or_path": "t5-base",
@@ -46,6 +46,6 @@
 "tensor_train_adapters": true,
 "tt_rank": 2,
 "tt_d": 3,
-"reverse_out_shape": true,
+"reverse_out_shape": false,
 "factorize_smaller_dim": true
 }
