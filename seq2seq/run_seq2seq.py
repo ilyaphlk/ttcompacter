@@ -100,6 +100,7 @@ class TrainingArguments(Seq2SeqTrainingArguments):
     compute_memory: Optional[bool] = field(default=False, metadata={"help": "if set, measures the memory"})
     prefix_length: Optional[int] = field(default=100, metadata={"help": "Defines the length for prefix tuning."})
     experiment_name: Optional[str] = field(default="default_name", metadata={"help": "Name used for experimentation."})
+    project_name: Optional[str] = field(default="TTAdapter", metadata={"help": "Project name for wandb."})
 
 @dataclass
 class ModelArguments:
@@ -288,7 +289,7 @@ def main():
     run = None
     #wandb.login()
     exp_name = data_args.task_name + "_" + training_args.experiment_name
-    run = wandb.init(project='TTAdapter', name=exp_name, entity='i_pakhalko')
+    run = wandb.init(project=training_args.project_name, name=exp_name, entity='i_pakhalko')
     # for dclass in [model_args, data_args, training_args, adapter_args]:
     #     attrs = [elem.name for elem in fields(dclass)]
     #     for attr in attrs:
