@@ -156,6 +156,11 @@ class AdapterTrainingArguments:
         metadata={"help": "Type of nonlinearity to add between Tensor Train cores"}
     )
 
+    use_scripted_mul: bool = field(
+        default=False,
+        metadata={"help": "If set, uses torch.jit to multiply Tensor Train cores"}
+    )
+
     freeze_cores: Optional[str] = field(
         default=None,
         metadata={"help": "If set, defines the strategy to freeze TT-cores for fine-tuning across tasks"}

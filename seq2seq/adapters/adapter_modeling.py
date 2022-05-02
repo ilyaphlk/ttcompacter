@@ -22,7 +22,8 @@ class TensorTrainAdapter(nn.Module):
             d=config.tt_d, tt_rank=config.tt_rank,
             shape=config.tt_shape, auto_shapes=autoshapes,
             reverse_out_shape=config.reverse_out_shape,
-            factorize_smaller_dim=config.factorize_smaller_dim
+            factorize_smaller_dim=config.factorize_smaller_dim,
+            use_scripted_mul=config.use_scripted_mul
         )
         self.tt_shape = self.down_sampler.shape
         upsample_shape = [list(reversed(self.tt_shape[1])), list(reversed(self.tt_shape[0]))]
@@ -31,7 +32,8 @@ class TensorTrainAdapter(nn.Module):
             d=config.tt_d, tt_rank=config.tt_rank,
             shape=upsample_shape, auto_shapes=autoshapes,
             reverse_out_shape=config.reverse_out_shape,
-            factorize_smaller_dim=config.factorize_smaller_dim
+            factorize_smaller_dim=config.factorize_smaller_dim,
+            use_scripted_mul=config.use_scripted_mul
         )
 
 

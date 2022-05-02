@@ -62,6 +62,7 @@ class AdapterConfig(object):
     tt_shape: List[List[int]] = None
     reverse_out_shape: bool = False
     cores_nonlinearity: str = None
+    use_scripted_mul: bool = False
 
     factorize_smaller_dim: bool = True
     freeze_cores = None  # either None, 'first' or 'last'
