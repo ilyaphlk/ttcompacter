@@ -44,5 +44,5 @@
 "task_expansion_factor": 0,
 "tensor_train_adapters": true,
 "tt_rank": 2,
-"tt_d": 7
+"tt_d": 5
 }
