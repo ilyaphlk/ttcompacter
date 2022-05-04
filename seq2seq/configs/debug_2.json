@@ -45,8 +45,8 @@
 "task_reduction_factor": 32,
 "task_expansion_factor": 0,
 "tensor_train_adapters": true,
-"tt_rank": 2,
-"tt_d": 3,
+"tt_rank": 1,
+"tt_d": 9,
 "reverse_out_shape": false,
 "factorize_smaller_dim": true
 }
