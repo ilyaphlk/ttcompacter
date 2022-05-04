@@ -15,7 +15,7 @@ class TensorTrainAdapter(nn.Module):
         if config.expansion_factor > 0:
             self.down_sample_size = self.input_dim * config.expansion_factor
         self.activation = Activations(config.non_linearity.lower())
-        self.cores_nonlinearity = Activations(config.cores_nonlinearity.lower())
+        self.cores_nonlinearity = None if config.cores_nonlinearity is None else Activations(config.cores_nonlinearity.lower())
 
         autoshapes = config.tt_shape is None
         self.down_sampler = TTLinear(
