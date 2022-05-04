@@ -63,6 +63,7 @@ class AdapterConfig(object):
     reverse_out_shape: bool = False
     cores_nonlinearity: str = None
     use_scripted_mul: bool = False
+    auto_shape_mode: str = 'ascending'
 
     factorize_smaller_dim: bool = True
     freeze_cores = None  # either None, 'first' or 'last'

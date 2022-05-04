@@ -161,12 +161,17 @@ class AdapterTrainingArguments:
         metadata={"help": "If set, uses torch.jit to multiply Tensor Train cores"}
     )
 
+    auto_shape_mode: str = field(
+        default='ascending',
+        metadata={"help": "shape factorization mode"}
+    )
+
+    # additional fields
+
     freeze_cores: Optional[str] = field(
         default=None,
         metadata={"help": "If set, defines the strategy to freeze TT-cores for fine-tuning across tasks"}
     )
-
-    # additional fields
 
     task_expansion_factor: Optional[int] = field(
         default=0,
