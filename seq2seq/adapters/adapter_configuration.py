@@ -57,6 +57,7 @@ class AdapterConfig(object):
 
     # Tensor-Train adapters.
     tensor_train_adapters: bool = False
+    tensor_train_single: bool = False
     tt_rank: int = 8
     tt_d: int = 3
     tt_shape: List[List[int]] = None

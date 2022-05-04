@@ -314,6 +314,7 @@ def main():
     run.config.cores_nonlinearity = adapter_args.cores_nonlinearity
     run.config.use_scripted_mul = adapter_args.use_scripted_mul
     run.config.auto_shape_mode = adapter_args.auto_shape_mode
+    run.config.tensor_train_single = adapter_args.tensor_train_single
 
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",

@@ -125,6 +125,7 @@ class AdapterTrainingArguments:
     # Tensor-Train adapters
 
     tensor_train_adapters: Optional[bool] = field(default=False, metadata={"help": "If set, uses the Tensor-Train adapters."})
+    tensor_train_single: Optional[bool] = field(default=False, metadata={"help": "If set, uses non-bottleneck scheme for Tensor-Train adapters."})
 
     tt_rank: Optional[int] = field(
         default=8,

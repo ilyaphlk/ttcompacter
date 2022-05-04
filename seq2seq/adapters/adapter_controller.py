@@ -21,6 +21,7 @@ class AdapterController(nn.Module):
         self.shared_phm_rule = config.shared_phm_rule
         self.hypercomplex_adapters = config.hypercomplex_adapters
         self.tensor_train_adapters = config.tensor_train_adapters
+        self.tensor_train_single = config.tensor_train_single
         self.adapters = self.construct_adapters(self.tasks)
         self.add_layer_norm_before_adapter = config.add_layer_norm_before_adapter
         self.add_layer_norm_after_adapter = config.add_layer_norm_after_adapter
@@ -44,6 +45,8 @@ class AdapterController(nn.Module):
                 self.adapters[task] = HyperComplexAdapter(self.config)
             elif self.low_rank_adapters:
                 self.adapters[task] = LowRankAdapter(self.config)
+            elif self.tensor_train_single:
+                self.adapters[task] = TensorTrainSingle(self.config)
             elif self.tensor_train_adapters:
                 self.adapters[task] = TensorTrainAdapter(self.config)
             else:

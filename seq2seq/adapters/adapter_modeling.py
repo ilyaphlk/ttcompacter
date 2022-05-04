@@ -6,6 +6,28 @@ from .low_rank_layer import LowRankLinear
 from t3nsor.layers import TTLinear
 
 
+class TensorTrainSingle(nn.Module):
+    def __init__(self, config):
+        super().__init__()
+        self.config = config
+        self.input_dim = config.input_dim
+        self.cores_nonlinearity = None if config.cores_nonlinearity is None else Activations(config.cores_nonlinearity.lower())
+
+        autoshapes = config.tt_shape is None
+        self.tt_layer = TTLinear(
+            self.input_dim, self.input_dim,
+            d=config.tt_d, tt_rank=config.tt_rank,
+            shape=config.tt_shape, auto_shapes=autoshapes,
+            auto_shape_mode=config.auto_shape_mode,
+            reverse_out_shape=config.reverse_out_shape,
+            use_scripted_mul=config.use_scripted_mul,
+            cores_nonlinearity=self.cores_nonlinearity
+        )
+
+    def forward(self, x):
+        return self.tt_layer(x)
+
+
 class TensorTrainAdapter(nn.Module):
     def __init__(self, config):
         super().__init__()
