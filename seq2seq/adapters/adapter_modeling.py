@@ -15,6 +15,7 @@ class TensorTrainAdapter(nn.Module):
         if config.expansion_factor > 0:
             self.down_sample_size = self.input_dim * config.expansion_factor
         self.activation = Activations(config.non_linearity.lower())
+        self.cores_nonlinearity = Activations(config.cores_nonlinearity.lower())
 
         autoshapes = config.tt_shape is None
         self.down_sampler = TTLinear(
@@ -24,10 +25,13 @@ class TensorTrainAdapter(nn.Module):
             auto_shape_mode=config.auto_shape_mode,
             reverse_out_shape=config.reverse_out_shape,
             factorize_smaller_dim=config.factorize_smaller_dim,
-            use_scripted_mul=config.use_scripted_mul
+            use_scripted_mul=config.use_scripted_mul,
+            cores_nonlinearity=self.cores_nonlinearity
         )
+
         self.tt_shape = self.down_sampler.shape
         upsample_shape = [list(reversed(self.tt_shape[1])), list(reversed(self.tt_shape[0]))]
+
         self.up_sampler = TTLinear(
             self.down_sample_size, self.input_dim,
             d=config.tt_d, tt_rank=config.tt_rank,
@@ -35,7 +39,8 @@ class TensorTrainAdapter(nn.Module):
             auto_shape_mode=config.auto_shape_mode,
             reverse_out_shape=config.reverse_out_shape,
             factorize_smaller_dim=config.factorize_smaller_dim,
-            use_scripted_mul=config.use_scripted_mul
+            use_scripted_mul=config.use_scripted_mul,
+            cores_nonlinearity=self.cores_nonlinearity
         )
 
 
