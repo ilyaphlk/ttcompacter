@@ -230,6 +230,19 @@ DEPARALLELIZE_DOCSTRING = r"""
 """
 
 
+class ScaleNorm(nn.Module):
+    """ScaleNorm"""
+    def __init__(self, scale, eps=1e-6):
+        super(ScaleNorm, self).__init__()
+        self.scale = Parameter(torch.tensor(scale))
+        self.eps = eps
+
+    def forward(self, x):
+        norm = self.scale / torch.norm(x, dim=-1, keepdim=True).clamp(min=self.eps)
+        return x * norm
+
+
+
 class T5LayerNorm(nn.Module):
     def __init__(self, hidden_size, eps=1e-6, adapter_config=None):
         """
