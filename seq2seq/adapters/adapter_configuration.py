@@ -66,7 +66,7 @@ class AdapterConfig(object):
     use_scripted_mul: bool = False
     auto_shape_mode: str = 'ascending'
     use_ScaleNorm: bool = False
-    ScaleNorm_scale: float
+    ScaleNorm_scale: float = 1.0
 
     factorize_smaller_dim: bool = True
     freeze_cores = None  # either None, 'first' or 'last'
