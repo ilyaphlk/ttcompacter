@@ -230,31 +230,24 @@ DEPARALLELIZE_DOCSTRING = r"""
 """
 
 
-class ScaleNorm(nn.Module):
-    """ScaleNorm"""
-    def __init__(self, scale, eps=1e-6):
-        super(ScaleNorm, self).__init__()
-        self.scale = Parameter(torch.tensor(scale))
-        self.eps = eps
-
-    def forward(self, x):
-        norm = self.scale / torch.norm(x, dim=-1, keepdim=True).clamp(min=self.eps)
-        return x * norm
-
-
-
 class T5LayerNorm(nn.Module):
     def __init__(self, hidden_size, eps=1e-6, adapter_config=None):
         """
         Construct a layernorm module in the T5 style No bias and no subtraction of mean.
         """
         super().__init__()
-        self.weight = nn.Parameter(torch.ones(hidden_size))
+        if adapter_config is not None and adapter_config.use_ScaleNorm:
+            self.weight = nn.Parameter(torch.tensor(adapter_config.ScaleNorm_scale))
+        else:
+            self.weight = nn.Parameter(torch.ones(hidden_size))
         self.variance_epsilon = eps
 
         self.bitfit = adapter_config.bitfit if adapter_config is not None else False 
         if self.bitfit:
-           self.bias = nn.Parameter(torch.zeros(hidden_size)) 
+            if adapter_config.use_ScaleNorm:
+                self.bias = nn.Parameter(torch.zeros(1))
+            else: 
+                self.bias = nn.Parameter(torch.zeros(hidden_size))
 
     def forward(self, hidden_states):
         

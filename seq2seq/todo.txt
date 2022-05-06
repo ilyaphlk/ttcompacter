@@ -51,6 +51,20 @@ LayerNorm всех сортов и расцветок
 5) ? LayerNorm из предложенного в compacter?
 
 
+ScaleNorm:
+- добавить арги в конфиг
+
+TTLayerNorm:
+- добавить арги в конфиг
+
+
+
+
+
+
+
+
+
 modeling_t5:233 - 
 
 

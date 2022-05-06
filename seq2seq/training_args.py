@@ -167,6 +167,16 @@ class AdapterTrainingArguments:
         metadata={"help": "shape factorization mode"}
     )
 
+    use_ScaleNorm: bool = field(
+        default=False,
+        metadata={"help": "if set, uses Scalar Layer Normalization (as proposed in Transformers Without Tears paper)"}
+    )
+
+    ScaleNorm_scale: float = field(
+        default=1.0,
+        metadata={"help": "scale factor for ScaleNorm"}
+    )
+
     # additional fields
 
     freeze_cores: Optional[str] = field(
