@@ -251,11 +251,13 @@ class T5LayerNorm(nn.Module):
         super().__init__()
         self.weight = nn.Parameter(torch.ones(hidden_size))
         self.variance_epsilon = eps
+
         self.bitfit = adapter_config.bitfit if adapter_config is not None else False 
         if self.bitfit:
            self.bias = nn.Parameter(torch.zeros(hidden_size)) 
 
     def forward(self, hidden_states):
+        
         # layer norm should always be calculated in float32
         variance = hidden_states.to(torch.float32).pow(2).mean(-1, keepdim=True)
         hidden_states = hidden_states * torch.rsqrt(variance + self.variance_epsilon)
@@ -263,9 +265,12 @@ class T5LayerNorm(nn.Module):
         # convert into float16 if necessary
         if self.weight.dtype == torch.float16:
             hidden_states = hidden_states.to(torch.float16)
+
         result = self.weight * hidden_states
+
         if self.bitfit:
-            result  = result + self.bias 
+            result  = result + self.bias
+
         return result 
 
 
