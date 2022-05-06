@@ -48,6 +48,7 @@ from seq2seq.hypercomplex.layers import  PHMLinear
 from seq2seq.hypercomplex.inits import  glorot_uniform, glorot_normal
 from typing import Dict, Any
 
+from t3nsor.layers import TTLayerNorm
 
 logger = logging.get_logger(__name__)
 
@@ -250,7 +251,6 @@ class T5LayerNorm(nn.Module):
                 self.bias = nn.Parameter(torch.zeros(hidden_size))
 
     def forward(self, hidden_states):
-        
         # layer norm should always be calculated in float32
         variance = hidden_states.to(torch.float32).pow(2).mean(-1, keepdim=True)
         hidden_states = hidden_states * torch.rsqrt(variance + self.variance_epsilon)
@@ -262,7 +262,7 @@ class T5LayerNorm(nn.Module):
         result = self.weight * hidden_states
 
         if self.bitfit:
-            result  = result + self.bias
+            result = result + self.bias
 
         return result 
 
@@ -319,7 +319,11 @@ class T5LayerFF(nn.Module):
             adapter_config.reduction_factor = adapter_config.task_reduction_factor
             adapter_config.expansion_factor = adapter_config.task_expansion_factor
             self.adapter_controller = AdapterController(adapter_config)
-        self.layer_norm = T5LayerNorm(config.d_model, eps=config.layer_norm_epsilon, adapter_config=adapter_config)
+
+        if adapter_config is not None and adapter_config.use_TTLayerNorm:
+            self.layer_norm = TTLayerNorm(config.d_model, 1, eps=config.layer_norm_epsilon)
+        else:
+            self.layer_norm = T5LayerNorm(config.d_model, eps=config.layer_norm_epsilon, adapter_config=adapter_config)
         self.dropout = nn.Dropout(config.dropout_rate)
 
     def forward(self, hidden_states, task_block_adapters=None, task=None):
@@ -556,7 +560,10 @@ class T5LayerSelfAttention(nn.Module):
     def __init__(self, config, has_relative_attention_bias=False, adapter_config=None):
         super().__init__()
         self.SelfAttention = T5Attention(config, has_relative_attention_bias=has_relative_attention_bias, adapter_config=adapter_config)
-        self.layer_norm = T5LayerNorm(config.d_model, eps=config.layer_norm_epsilon, adapter_config=adapter_config)
+        if adapter_config is not None and adapter_config.use_TTLayerNorm:
+            self.layer_norm = TTLayerNorm(config.d_model, 1, eps=config.layer_norm_epsilon)
+        else:
+            self.layer_norm = T5LayerNorm(config.d_model, eps=config.layer_norm_epsilon, adapter_config=adapter_config)
         self.train_task_adapters = config.train_task_adapters and adapter_config.add_adapter_in_self_attention
         if self.train_task_adapters:
             adapter_config.reduction_factor = adapter_config.task_reduction_factor
@@ -599,7 +606,10 @@ class T5LayerCrossAttention(nn.Module):
     def __init__(self, config, adapter_config=None):
         super().__init__()
         self.EncDecAttention = T5Attention(config, has_relative_attention_bias=False, adapter_config=adapter_config)
-        self.layer_norm = T5LayerNorm(config.d_model, eps=config.layer_norm_epsilon, adapter_config=adapter_config)
+        if adapter_config is not None and adapter_config.use_TTLayerNorm:
+            self.layer_norm = TTLayerNorm(config.d_model, 1, eps=config.layer_norm_epsilon)
+        else:
+            self.layer_norm = T5LayerNorm(config.d_model, eps=config.layer_norm_epsilon, adapter_config=adapter_config)
         self.dropout = nn.Dropout(config.dropout_rate)
 
     def forward(
@@ -865,7 +875,10 @@ class T5Stack(T5PreTrainedModel):
                      has_relative_attention_bias=bool(i == 0),
                      adapter_config=adapter_config) for i in range(config.num_layers)]
         )
-        self.final_layer_norm = T5LayerNorm(config.d_model, eps=config.layer_norm_epsilon)
+        if adapter_config is not None and adapter_config.use_TTLayerNorm:
+            self.final_layer_norm = TTLayerNorm(config.d_model, 1, eps=config.layer_norm_epsilon)
+        else:
+            self.final_layer_norm = T5LayerNorm(config.d_model, eps=config.layer_norm_epsilon)
         self.dropout = nn.Dropout(config.dropout_rate)
 
         self.init_weights()

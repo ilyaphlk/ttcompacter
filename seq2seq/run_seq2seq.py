@@ -317,6 +317,7 @@ def main():
     run.config.tensor_train_single = adapter_args.tensor_train_single
     run.config.use_ScaleNorm = adapter_args.use_ScaleNorm
     run.config.ScaleNorm_scale = adapter_args.ScaleNorm_scale
+    run.config.use_TTLayerNorm = adapter_args.use_TTLayerNorm
 
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",

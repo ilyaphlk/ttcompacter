@@ -177,6 +177,11 @@ class AdapterTrainingArguments:
         metadata={"help": "scale factor for ScaleNorm"}
     )
 
+    use_TTLayerNorm: bool = field(
+        default=False,
+        metadata={"help": "use TTLinear layer to represent LayerNorm vector"}
+    )
+
     # additional fields
 
     freeze_cores: Optional[str] = field(

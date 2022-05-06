@@ -68,6 +68,8 @@ class AdapterConfig(object):
     use_ScaleNorm: bool = False
     ScaleNorm_scale: float = 1.0
 
+    use_TTLayerNorm: bool = False
+
     factorize_smaller_dim: bool = True
     freeze_cores = None  # either None, 'first' or 'last'
 

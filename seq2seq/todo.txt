@@ -56,8 +56,14 @@ ScaleNorm:
 
 TTLayerNorm:
 - добавить арги в конфиг
+- выписать всё в отдельный класс, чтобы не ифать
+t3nsor/layers.py - сделать TTLayerNorm
+initializers.py - random_matrix, matrix_with_random_cores, const_initializer
+__init__.py - import const_initializer
 
-
+import в modeling_t5.py
+- понять, какая должна быть инициализация, чтобы в начале вектор был единичным
+(ones(...) / tt_rank ** ((d-1)/d))
 
 
 
@@ -95,7 +101,7 @@ Tensor Basis + TR
 ####################
 В Method подробнее описать Tensor Train, например, описать концепцию тензорного ранга (?)
 
-
+TTLayerNorm - недостающее звено между ScaleNorm и LayerNorm по числу обучаемых параметров
 
 
 
