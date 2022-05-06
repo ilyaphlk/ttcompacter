@@ -46,7 +46,10 @@
 "task_expansion_factor": 0,
 "tensor_train_adapters": true,
 "tt_rank": 1,
-"tt_d": 9,
+"tt_d": 5,
 "reverse_out_shape": false,
-"factorize_smaller_dim": true
+"factorize_smaller_dim": true,
+"tensor_train_single": false,
+"use_ScaleNorm": false,
+"ScaleNorm_scale": 1.0
 }
