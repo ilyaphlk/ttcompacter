@@ -8,6 +8,7 @@ import json
 from seq2seq.adapters import (AutoAdapterConfig, AdapterController, Adapter, HyperComplexAdapter)
 from projections.intrinsic import intrinsic_dimension, intrinsic_dimension_said
 from seq2seq.third_party.models.t5 import T5LayerNorm
+from t3nsor.layers import TTLayerNorm
 
 
 logging.basicConfig(
@@ -110,7 +111,8 @@ def freeze_model_params(model, adapter_args):
     # Unfreezes layer norms.
     if adapter_args.unfreeze_layer_norms:
         for name, sub_module in model.named_modules():
-            if isinstance(sub_module, (T5LayerNorm, nn.LayerNorm)):
+            if isinstance(sub_module, (T5LayerNorm, nn.LayerNorm, TTLayerNorm)):
+                print("found layernorm", len(name.split(".")), name)
                 if len(name.split(".")) < 7: # this will not consider layer norms inside adapters then.
                     for param_name, param in sub_module.named_parameters():
                         param.requires_grad = True
@@ -218,6 +220,8 @@ def modify_model_after_init(model, training_args, adapter_args, run=None):
     for n, p in model.named_parameters():
         if p.requires_grad:
             print("inside n ", n)
+        else:
+            print("leftover ", n)
 
     model_info = None
     if training_args.print_num_parameters:
