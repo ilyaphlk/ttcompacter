@@ -1,4 +1,174 @@
-from typing import Dict, List, Optional
+import collections
+import inspect
+import math
+import os
+import random
+import re
+import shutil
+import sys
+import tempfile
+import time
+import warnings
+from logging import StreamHandler
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union
+
+from tqdm.auto import tqdm
+
+
+# Integrations must be imported before ML frameworks:
+from transformers.integrations import (  # isort: split
+    default_hp_search_backend,
+    get_reporting_integration_callbacks,
+    hp_params,
+    is_fairscale_available,
+    is_optuna_available,
+    is_ray_tune_available,
+    run_hp_search_optuna,
+    run_hp_search_ray,
+    deepspeed_init,
+    is_deepspeed_zero3_enabled,
+)
+
+import numpy as np
+import torch
+from packaging import version
+from torch import nn
+from torch.utils.data.dataloader import DataLoader
+from torch.utils.data.dataset import Dataset, IterableDataset
+from torch.utils.data.distributed import DistributedSampler
+from torch.utils.data.sampler import RandomSampler, SequentialSampler
+
+from transformers import __version__
+from transformers.configuration_utils import PretrainedConfig
+from transformers.data.data_collator import DataCollator, DataCollatorWithPadding, default_data_collator
+from transformers.debug_utils import DebugOption, DebugUnderflowOverflow
+from transformers.dependency_versions_check import dep_version_check
+from transformers.file_utils import (
+    CONFIG_NAME,
+    WEIGHTS_NAME,
+    PushToHubMixin,
+    is_apex_available,
+    is_datasets_available,
+    is_in_notebook,
+    is_sagemaker_dp_enabled,
+    is_sagemaker_mp_enabled,
+    is_torch_tpu_available,
+    is_training_run_on_sagemaker,
+)
+from transformers.modelcard import TrainingSummary
+from transformers.modeling_utils import PreTrainedModel, unwrap_model
+from transformers.optimization import Adafactor, AdamW, get_scheduler
+from transformers.tokenization_utils_base import PreTrainedTokenizerBase
+from transformers.trainer_callback import (
+    CallbackHandler,
+    DefaultFlowCallback,
+    PrinterCallback,
+    ProgressCallback,
+    TrainerCallback,
+    TrainerControl,
+    TrainerState,
+)
+from transformers.trainer_pt_utils import (
+    DistributedLengthGroupedSampler,
+    DistributedSamplerWithLoop,
+    DistributedTensorGatherer,
+    IterableDatasetShard,
+    LabelSmoother,
+    LengthGroupedSampler,
+    SequentialDistributedSampler,
+    ShardSampler,
+    distributed_broadcast_scalars,
+    distributed_concat,
+    find_batch_size,
+    get_parameter_names,
+    nested_concat,
+    nested_detach,
+    nested_numpify,
+    nested_truncate,
+    nested_xla_mesh_reduce,
+    reissue_pt_warnings,
+)
+from transformers.trainer_utils import (
+    PREFIX_CHECKPOINT_DIR,
+    BestRun,
+    EvalLoopOutput,
+    EvalPrediction,
+    HPSearchBackend,
+    PredictionOutput,
+    ShardedDDPOption,
+    TrainerMemoryTracker,
+    TrainOutput,
+    default_compute_objective,
+    default_hp_space,
+    denumpify_detensorize,
+    get_last_checkpoint,
+    set_seed,
+    speed_metrics,
+)
+from transformers.training_args import ParallelMode, TrainingArguments
+from transformers.utils import logging
+from transformers.utils.modeling_auto_mapping import MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES
+
+
+_is_torch_generator_available = False
+_is_native_amp_available = False
+
+DEFAULT_CALLBACKS = [DefaultFlowCallback]
+DEFAULT_PROGRESS_CALLBACK = ProgressCallback
+
+if is_in_notebook():
+    from .utils.notebook import NotebookProgressCallback
+
+    DEFAULT_PROGRESS_CALLBACK = NotebookProgressCallback
+
+if is_apex_available():
+    from apex import amp
+
+if version.parse(torch.__version__) >= version.parse("1.6"):
+    _is_torch_generator_available = True
+    _is_native_amp_available = True
+    from torch.cuda.amp import autocast
+
+if is_datasets_available():
+    import datasets
+
+if is_torch_tpu_available():
+    import torch_xla.core.xla_model as xm
+    import torch_xla.debug.metrics as met
+    import torch_xla.distributed.parallel_loader as pl
+
+if is_fairscale_available():
+    dep_version_check("fairscale")
+    import fairscale
+    from fairscale.nn.data_parallel import FullyShardedDataParallel as FullyShardedDDP
+    from fairscale.nn.data_parallel import ShardedDataParallel as ShardedDDP
+    from fairscale.nn.wrap import auto_wrap
+    from fairscale.optim import OSS
+    from fairscale.optim.grad_scaler import ShardedGradScaler
+
+if is_sagemaker_dp_enabled():
+    import smdistributed.dataparallel.torch.distributed as dist
+    from smdistributed.dataparallel.torch.parallel.distributed import DistributedDataParallel as DDP
+else:
+    import torch.distributed as dist
+
+if is_sagemaker_mp_enabled():
+    import smdistributed.modelparallel.torch as smp
+
+    from .trainer_pt_utils import smp_forward_backward, smp_forward_only, smp_gather, smp_nested_concat
+
+if is_training_run_on_sagemaker():
+    logging.add_handler(StreamHandler(sys.stdout))
+
+
+if TYPE_CHECKING:
+    import optuna
+
+
+
+
+from typing import Dict, List, Optional, Union
 import numpy as np 
 import time
 import torch
