@@ -700,7 +700,7 @@ class BaseTrainer(Trainer):
                 for _ in train_dataloader:
                     break
 
-        params_w_grad = [p for p in model.parameters() if p.grad is not None]
+        params_w_grad = None
 
         for epoch in range(epochs_trained, num_train_epochs):
             if isinstance(train_dataloader, DataLoader) and isinstance(train_dataloader.sampler, DistributedSampler):
@@ -766,6 +766,10 @@ class BaseTrainer(Trainer):
                     # calculate global grad norm
 
                     total_norm = 0.0
+
+                    if params_w_grad is None:
+                        params_w_grad = [p for p in model.parameters() if p.grad is not None]
+
                     for p in params_w_grad:
                         param_norm = p.grad.detach().data.norm(2)
                         total_norm += param_norm.item() ** 2
