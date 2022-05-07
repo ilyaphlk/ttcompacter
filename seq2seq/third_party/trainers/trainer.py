@@ -763,6 +763,7 @@ class BaseTrainer(Trainer):
                     #########################
                     # calculate global grad norm
 
+                    total_norm = 0.0
                     for p in model.parameters():
                         if p.grad is not None:
                             param_norm = p.grad.detach().data.norm(2)
