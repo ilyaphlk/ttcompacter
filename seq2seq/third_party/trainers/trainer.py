@@ -765,7 +765,7 @@ class BaseTrainer(Trainer):
 
                     total_norm = 0.0
 
-                    if (self.global_step + 1) % args.logging_steps == 0:
+                    if (self.state.global_step + 1) % args.logging_steps == 0:
                         for p in model.parameters():
                             if p.grad is not None:
                                 param_norm = p.grad.detach().data.norm(2)
