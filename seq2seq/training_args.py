@@ -182,6 +182,11 @@ class AdapterTrainingArguments:
         metadata={"help": "use TTLinear layer to represent LayerNorm vector"}
     )
 
+    use_TTBias: bool = field(
+        default=False,
+        metadata={"help": "if set, tensorises bias in adapter layers"}
+    )
+
     # additional fields
 
     freeze_cores: Optional[str] = field(
