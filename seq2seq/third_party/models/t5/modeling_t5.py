@@ -1110,20 +1110,30 @@ class T5PreTrainedModel(PreTrainedModel):
         else:
             model_kwargs = kwargs
 
+
+        print("MODEL KWARGS:")
+        print(model_kwargs)
+
         # Load model
         if pretrained_model_name_or_path is not None:
+            print("in if pretrained_model_name_or_path")
             pretrained_model_name_or_path = str(pretrained_model_name_or_path)
             if os.path.isdir(pretrained_model_name_or_path):
+                print("in if isdir")
                 if from_tf and os.path.isfile(os.path.join(pretrained_model_name_or_path, TF_WEIGHTS_NAME + ".index")):
                     # Load from a TF 1.0 checkpoint in priority if from_tf
+                    print("in 1")
                     archive_file = os.path.join(pretrained_model_name_or_path, TF_WEIGHTS_NAME + ".index")
                 elif from_tf and os.path.isfile(os.path.join(pretrained_model_name_or_path, TF2_WEIGHTS_NAME)):
+                    print("in 2")
                     # Load from a TF 2.0 checkpoint in priority if from_tf
                     archive_file = os.path.join(pretrained_model_name_or_path, TF2_WEIGHTS_NAME)
                 elif from_flax and os.path.isfile(os.path.join(pretrained_model_name_or_path, FLAX_WEIGHTS_NAME)):
+                    print("in 3")
                     # Load from a Flax checkpoint in priority if from_flax
                     archive_file = os.path.join(pretrained_model_name_or_path, FLAX_WEIGHTS_NAME)
                 elif os.path.isfile(os.path.join(pretrained_model_name_or_path, WEIGHTS_NAME)):
+                    print("in 4")
                     # Load from a PyTorch checkpoint
                     archive_file = os.path.join(pretrained_model_name_or_path, WEIGHTS_NAME)
                 else:
@@ -1132,8 +1142,10 @@ class T5PreTrainedModel(PreTrainedModel):
                         f"directory {pretrained_model_name_or_path} or `from_tf` and `from_flax` set to False."
                     )
             elif os.path.isfile(pretrained_model_name_or_path) or is_remote_url(pretrained_model_name_or_path):
+                print("in 5")
                 archive_file = pretrained_model_name_or_path
             elif os.path.isfile(pretrained_model_name_or_path + ".index"):
+                print("in 6")
                 if not from_tf:
                     raise ValueError(
                         f"We found a TensorFlow checkpoint at {pretrained_model_name_or_path + '.index'}, please set "
@@ -1142,11 +1154,15 @@ class T5PreTrainedModel(PreTrainedModel):
                 archive_file = pretrained_model_name_or_path + ".index"
             else:
                 # set correct filename
+                print("in 6.5")
                 if from_tf:
+                    print("in 7")
                     filename = TF2_WEIGHTS_NAME
                 elif from_flax:
+                    print("in 8")
                     filename = FLAX_WEIGHTS_NAME
                 else:
+                    print("in 9")
                     filename = WEIGHTS_NAME
 
                 archive_file = hf_bucket_url(
@@ -1157,6 +1173,7 @@ class T5PreTrainedModel(PreTrainedModel):
                 )
 
             try:
+                print("in 10")
                 # Load from URL or cache if already cached
                 resolved_archive_file = cached_path(
                     archive_file,
@@ -1182,6 +1199,7 @@ class T5PreTrainedModel(PreTrainedModel):
             else:
                 logger.info(f"loading weights file {archive_file} from cache at {resolved_archive_file}")
         else:
+            print("in 11")
             resolved_archive_file = None
 
         config.name_or_path = pretrained_model_name_or_path
@@ -1221,6 +1239,7 @@ class T5PreTrainedModel(PreTrainedModel):
                     )
                     raise
         elif from_flax:
+            print("in 12")
             try:
                 from .modeling_flax_pytorch_utils import load_flax_checkpoint_in_pytorch_model
 
@@ -1232,6 +1251,7 @@ class T5PreTrainedModel(PreTrainedModel):
                 )
                 raise
         else:
+            print("in 13")
             if state_dict is None:
                 try:
                     state_dict = torch.load(resolved_archive_file, map_location="cpu")
