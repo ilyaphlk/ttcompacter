@@ -1,5 +1,6 @@
 """Implements an Adapter, Low-rank adapters and Hyper-adapter Layers."""
 import torch.nn as nn
+import torch
 from .adapter_utils import Activations
 from seq2seq.hypercomplex.layers import PHMLinear
 from .low_rank_layer import LowRankLinear
