@@ -1201,13 +1201,17 @@ class T5PreTrainedModel(PreTrainedModel):
                 model = cls(config, *model_args, **model_kwargs)
 
         if from_tf:
+            print("FROM TF")
+            print("resolved archive_file:", resolved_archive_file)
             if resolved_archive_file.endswith(".index"):
+                print("USING OUR load_tf_weights")
                 # Load from a TensorFlow 1.X checkpoint - provided by original authors
                 model, unused_weights = cls.load_tf_weights(model, config, resolved_archive_file[:-6])  # Remove the '.index'
             else:
                 # Load from our TensorFlow 2.0 checkpoints
+                print("LOADING FROM 2")
                 try:
-                    from .modeling_tf_pytorch_utils import load_tf2_checkpoint_in_pytorch_model
+                    from transformers.modeling_tf_pytorch_utils import load_tf2_checkpoint_in_pytorch_model
 
                     model = load_tf2_checkpoint_in_pytorch_model(model, resolved_archive_file, allow_missing_keys=True)
                 except ImportError:
