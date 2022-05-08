@@ -65,10 +65,11 @@ class AdapterConfig(object):
     cores_nonlinearity: str = None
     use_scripted_mul: bool = False
     auto_shape_mode: str = 'ascending'
+
     use_ScaleNorm: bool = False
     ScaleNorm_scale: float = 1.0
-
     use_TTLayerNorm: bool = False
+    use_bias: bool = True
     use_TTBias: bool = False
 
     factorize_smaller_dim: bool = True

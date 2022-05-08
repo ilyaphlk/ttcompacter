@@ -3,7 +3,7 @@ import torch.nn as nn
 from .adapter_utils import Activations
 from seq2seq.hypercomplex.layers import PHMLinear
 from .low_rank_layer import LowRankLinear
-from t3nsor.layers import TTLinear
+from t3nsor.layers import TTLinear, TTBias
 
 
 class TensorTrainSingle(nn.Module):
@@ -16,16 +16,26 @@ class TensorTrainSingle(nn.Module):
         autoshapes = config.tt_shape is None
         self.tt_layer = TTLinear(
             self.input_dim, self.input_dim,
+            bias=False,
             d=config.tt_d, tt_rank=config.tt_rank,
             shape=config.tt_shape, auto_shapes=autoshapes,
             auto_shape_mode=config.auto_shape_mode,
             reverse_out_shape=config.reverse_out_shape,
             use_scripted_mul=config.use_scripted_mul,
             cores_nonlinearity=self.cores_nonlinearity,
-            use_TTBias=config.use_TTBias
         )
+        if config.use_bias and config.use_TTBias:
+            self.bias = TTBias(self.input_dim, 1)
+        elif config.use_bias:
+            self.bias = torch.nn.Parameter(1e-3 * torch.ones(out_features))
+        else:
+            self.register_parameter('bias', None)
 
     def forward(self, x):
+        if config.use_bias and self.config.use_TTBias:
+            return self.bias(self.tt_layer(x))
+        elif config.use_bias:
+            return self.tt_layer(x) + self.bias
         return self.tt_layer(x)
 
 
@@ -39,10 +49,20 @@ class TensorTrainAdapter(nn.Module):
             self.down_sample_size = self.input_dim * config.expansion_factor
         self.activation = Activations(config.non_linearity.lower())
         self.cores_nonlinearity = None if config.cores_nonlinearity is None else Activations(config.cores_nonlinearity.lower())
+        if config.use_bias and config.use_TTBias:
+            self.bias_down = TTBias(self.down_sample_size, 1)
+            self.bias_up = TTBias(self.input_dim, 1)
+        elif config.use_bias:
+            self.bias_down = torch.nn.Parameter(1e-3 * torch.ones(self.down_sample_size))
+            self.bias_up = torch.nn.Parameter(1e-3 * torch.ones(self.input_dim))
+        else:
+            self.register_parameter('bias_down', None)
+            self.register_parameter('bias_up', None)
 
         autoshapes = config.tt_shape is None
         self.down_sampler = TTLinear(
             self.input_dim, self.down_sample_size,
+            bias=False,
             d=config.tt_d, tt_rank=config.tt_rank,
             shape=config.tt_shape, auto_shapes=autoshapes,
             auto_shape_mode=config.auto_shape_mode,
@@ -50,7 +70,6 @@ class TensorTrainAdapter(nn.Module):
             factorize_smaller_dim=config.factorize_smaller_dim,
             use_scripted_mul=config.use_scripted_mul,
             cores_nonlinearity=self.cores_nonlinearity,
-            use_TTBias=config.use_TTBias
         )
 
         self.tt_shape = self.down_sampler.shape
@@ -58,6 +77,7 @@ class TensorTrainAdapter(nn.Module):
 
         self.up_sampler = TTLinear(
             self.down_sample_size, self.input_dim,
+            bias=False,
             d=config.tt_d, tt_rank=config.tt_rank,
             shape=upsample_shape, auto_shapes=autoshapes,
             auto_shape_mode=config.auto_shape_mode,
@@ -65,15 +85,26 @@ class TensorTrainAdapter(nn.Module):
             factorize_smaller_dim=config.factorize_smaller_dim,
             use_scripted_mul=config.use_scripted_mul,
             cores_nonlinearity=self.cores_nonlinearity,
-            use_TTBias=config.use_TTBias
         )
 
 
     def forward(self, x):
-        z = self.down_sampler(x)
+        if config.use_bias and self.config.use_TTBias:
+            z = self.bias_down(self.down_sampler(x))
+        elif config.use_bias:
+            z = self.down_sampler(x) + self.bias_down
+        else:
+            z = self.down_sampler(x)
+        
         z = self.activation(z)
-        output = self.up_sampler(z)
-        return output
+
+        if config.use_bias and self.config.use_TTBias:
+            z = self.bias_up(self.up_sampler(z))
+        elif config.use_bias:
+            z = self.up_sampler(z) + self.bias_up
+        else:
+            z = self.up_sampler(z)
+        return z
 
 
 class LowRankAdapter(nn.Module):

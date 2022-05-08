@@ -318,6 +318,7 @@ def main():
     run.config.use_ScaleNorm = adapter_args.use_ScaleNorm
     run.config.ScaleNorm_scale = adapter_args.ScaleNorm_scale
     run.config.use_TTLayerNorm = adapter_args.use_TTLayerNorm
+    run.config.use_bias = adapter_args.use_bias
     run.config.use_TTBias = adapter_args.use_TTBias
 
     logging.basicConfig(
