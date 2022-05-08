@@ -13,6 +13,45 @@
 # limitations under the License.
 """ PyTorch T5 model. """
 
+
+import inspect
+import logging
+import os
+from typing import Callable, Dict, List, Optional, Tuple
+
+import torch
+from torch import Tensor, device, dtype, nn
+from torch.nn import CrossEntropyLoss
+from torch.nn import functional as F
+
+from transformers.activations import get_activation
+from transformers.configuration_utils import PretrainedConfig
+from transformers.file_utils import (
+    DUMMY_INPUTS,
+    TF2_WEIGHTS_NAME,
+    TF_WEIGHTS_NAME,
+    WEIGHTS_NAME,
+    cached_path,
+    hf_bucket_url,
+    is_remote_url,
+)
+from transformers.generation_utils import GenerationMixin
+
+try:
+    from torch.nn import Identity
+except ImportError:
+    # Older PyTorch compatibility
+    class Identity(nn.Module):
+        r"""A placeholder identity operator that is argument-insensitive.
+        """
+
+        def __init__(self, *args, **kwargs):
+            super().__init__()
+
+        def forward(self, input):
+            return input
+
+
 import copy
 import math
 import os
