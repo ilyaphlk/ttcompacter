@@ -27,7 +27,7 @@ class TensorTrainSingle(nn.Module):
         if config.use_bias and config.use_TTBias:
             self.bias = TTBias(self.input_dim, 1)
         elif config.use_bias:
-            self.bias = torch.nn.Parameter(1e-3 * torch.ones(out_features))
+            self.bias = nn.Parameter(1e-3 * torch.ones(out_features))
         else:
             self.register_parameter('bias', None)
 
@@ -53,8 +53,8 @@ class TensorTrainAdapter(nn.Module):
             self.bias_down = TTBias(self.down_sample_size, 1)
             self.bias_up = TTBias(self.input_dim, 1)
         elif config.use_bias:
-            self.bias_down = torch.nn.Parameter(1e-3 * torch.ones(self.down_sample_size))
-            self.bias_up = torch.nn.Parameter(1e-3 * torch.ones(self.input_dim))
+            self.bias_down = nn.Parameter(1e-3 * torch.ones(self.down_sample_size))
+            self.bias_up = nn.Parameter(1e-3 * torch.ones(self.input_dim))
         else:
             self.register_parameter('bias_down', None)
             self.register_parameter('bias_up', None)
