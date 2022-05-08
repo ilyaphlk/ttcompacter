@@ -1265,6 +1265,7 @@ class T5PreTrainedModel(PreTrainedModel):
             model, missing_keys, unexpected_keys, error_msgs = cls._load_state_dict_into_model(
                 model, state_dict, pretrained_model_name_or_path, _fast_init=_fast_init
             )
+            unused_weights = {k:state_dict[k] for k in unexpected_keys}
 
         # make sure token embedding weights are still tied if needed
         model.tie_weights()
