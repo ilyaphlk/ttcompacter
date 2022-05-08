@@ -28,9 +28,9 @@ from torch import Tensor, device, dtype, nn
 from torch.nn import CrossEntropyLoss
 from torch.nn import functional as F
 
-from .activations import get_activation
-from .configuration_utils import PretrainedConfig
-from .file_utils import (
+from transformers.activations import get_activation
+from transformers.configuration_utils import PretrainedConfig
+from transformers.file_utils import (
     CONFIG_NAME,
     DUMMY_INPUTS,
     FLAX_WEIGHTS_NAME,
@@ -45,9 +45,9 @@ from .file_utils import (
     is_remote_url,
     replace_return_docstrings,
 )
-from .generation_utils import GenerationMixin
-from .integrations import deepspeed_config, is_deepspeed_zero3_enabled
-from .utils import logging
+from transformers.generation_utils import GenerationMixin
+from transformers.integrations import deepspeed_config, is_deepspeed_zero3_enabled
+from transformers.utils import logging
 
 _init_weights = True
 
