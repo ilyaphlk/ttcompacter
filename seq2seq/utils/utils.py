@@ -204,7 +204,23 @@ class ModelInfo:
     total_trainable_lm_head_params_percent: float = None
 
 
-def modify_model_after_init(model, training_args, adapter_args, run=None):
+def init_TTLayerNorms(model, unused_weights):
+    if unused_weights is None:
+        return
+    
+    print("#####################")
+    print("unused weights keys:")
+
+    for k, v in unused_weights:
+        print(k)
+
+    print("#####################")
+
+def modify_model_after_init(model, training_args, adapter_args, run=None, unused_weights=None):
+
+    if adapter_args.use_TTLayerNorm:
+        init_TTLayerNorms(model, unused_weights)
+
     # Freezes model parameters.
     freeze_model_params(model, adapter_args)
     if adapter_args.intrinsic_model:
