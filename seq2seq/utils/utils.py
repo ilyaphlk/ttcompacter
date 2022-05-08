@@ -211,8 +211,9 @@ def init_TTLayerNorms(model, unused_weights):
     print("#####################")
     print("unused weights keys:")
 
-    for k, v in unused_weights:
+    for k, v in unused_weights.items():
         print(k)
+        print(type(v))
 
     print("#####################")
 
