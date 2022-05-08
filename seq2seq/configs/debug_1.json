@@ -36,6 +36,7 @@
 "eval_dataset_name": "mrpc", 
 "test_dataset_name": "mrpc",
 "num_train_epochs": 1,
+"logging_steps":5,
 "learning_rate": 3e-4,
 "warmup_steps": 500,
 "per_device_train_batch_size": 25,
@@ -52,5 +53,6 @@
 "tensor_train_single": false,
 "use_ScaleNorm": false,
 "ScaleNorm_scale": 1.0,
-"use_TTLayerNorm": true
+"use_TTLayerNorm": true,
+"use_TTBias": true,
 }

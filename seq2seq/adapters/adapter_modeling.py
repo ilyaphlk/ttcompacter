@@ -21,7 +21,8 @@ class TensorTrainSingle(nn.Module):
             auto_shape_mode=config.auto_shape_mode,
             reverse_out_shape=config.reverse_out_shape,
             use_scripted_mul=config.use_scripted_mul,
-            cores_nonlinearity=self.cores_nonlinearity
+            cores_nonlinearity=self.cores_nonlinearity,
+            use_TTBias=config.use_TTBias
         )
 
     def forward(self, x):
@@ -48,7 +49,8 @@ class TensorTrainAdapter(nn.Module):
             reverse_out_shape=config.reverse_out_shape,
             factorize_smaller_dim=config.factorize_smaller_dim,
             use_scripted_mul=config.use_scripted_mul,
-            cores_nonlinearity=self.cores_nonlinearity
+            cores_nonlinearity=self.cores_nonlinearity,
+            use_TTBias=config.use_TTBias
         )
 
         self.tt_shape = self.down_sampler.shape
@@ -62,7 +64,8 @@ class TensorTrainAdapter(nn.Module):
             reverse_out_shape=config.reverse_out_shape,
             factorize_smaller_dim=config.factorize_smaller_dim,
             use_scripted_mul=config.use_scripted_mul,
-            cores_nonlinearity=self.cores_nonlinearity
+            cores_nonlinearity=self.cores_nonlinearity,
+            use_TTBias=config.use_TTBias
         )
 
 

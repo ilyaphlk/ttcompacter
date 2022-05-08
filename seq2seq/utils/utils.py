@@ -232,7 +232,7 @@ def modify_model_after_init(model, training_args, adapter_args, run=None):
         total_lm_head_params = sum(p.numel() for p in model.lm_head.parameters())
         total_trainable_lm_head_params = sum(p.numel() for p in model.lm_head.parameters() if p.requires_grad)
         total_trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-        total_trainable_bias_params = sum(p.numel() for n, p in model.named_parameters() if p.requires_grad and n.endswith(".b"))
+        total_trainable_bias_params = sum(p.numel() for n, p in model.named_parameters() if p.requires_grad and (n.endswith(".b") or n.endswith(".bias") or ".bias." in n))
         total_trainable_layernorm_params = sum(p.numel() for n, p in model.named_parameters() if p.requires_grad and ".layer_norm." in n)
         total_params = sum(p.numel() for p in model.parameters())
         logger.info("Total trainable parameters %s", total_trainable_params)
