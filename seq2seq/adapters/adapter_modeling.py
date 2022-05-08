@@ -32,9 +32,9 @@ class TensorTrainSingle(nn.Module):
             self.register_parameter('bias', None)
 
     def forward(self, x):
-        if config.use_bias and self.config.use_TTBias:
+        if self.config.use_bias and self.config.use_TTBias:
             return self.bias(self.tt_layer(x))
-        elif config.use_bias:
+        elif self.config.use_bias:
             return self.tt_layer(x) + self.bias
         return self.tt_layer(x)
 
@@ -89,18 +89,18 @@ class TensorTrainAdapter(nn.Module):
 
 
     def forward(self, x):
-        if config.use_bias and self.config.use_TTBias:
+        if self.config.use_bias and self.config.use_TTBias:
             z = self.bias_down(self.down_sampler(x))
-        elif config.use_bias:
+        elif self.config.use_bias:
             z = self.down_sampler(x) + self.bias_down
         else:
             z = self.down_sampler(x)
         
         z = self.activation(z)
 
-        if config.use_bias and self.config.use_TTBias:
+        if self.config.use_bias and self.config.use_TTBias:
             z = self.bias_up(self.up_sampler(z))
-        elif config.use_bias:
+        elif self.config.use_bias:
             z = self.up_sampler(z) + self.bias_up
         else:
             z = self.up_sampler(z)
