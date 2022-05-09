@@ -392,7 +392,7 @@ class T5LayerFF(nn.Module):
             self.adapter_controller = AdapterController(adapter_config)
 
         if adapter_config is not None and adapter_config.use_TTLayerNorm:
-            self.layer_norm = TTLayerNorm(config.d_model, 1, tt_rank=config.TTLayerNorm_rk, eps=config.layer_norm_epsilon)
+            self.layer_norm = TTLayerNorm(config.d_model, 1, tt_rank=adapter_config.TTLayerNorm_rk, eps=config.layer_norm_epsilon)
         else:
             self.layer_norm = T5LayerNorm(config.d_model, eps=config.layer_norm_epsilon, adapter_config=adapter_config)
         self.dropout = nn.Dropout(config.dropout_rate)
@@ -632,7 +632,7 @@ class T5LayerSelfAttention(nn.Module):
         super().__init__()
         self.SelfAttention = T5Attention(config, has_relative_attention_bias=has_relative_attention_bias, adapter_config=adapter_config)
         if adapter_config is not None and adapter_config.use_TTLayerNorm:
-            self.layer_norm = TTLayerNorm(config.d_model, 1, tt_rank=config.TTLayerNorm_rk, eps=config.layer_norm_epsilon)
+            self.layer_norm = TTLayerNorm(config.d_model, 1, tt_rank=adapter_config.TTLayerNorm_rk, eps=config.layer_norm_epsilon)
         else:
             self.layer_norm = T5LayerNorm(config.d_model, eps=config.layer_norm_epsilon, adapter_config=adapter_config)
         self.train_task_adapters = config.train_task_adapters and adapter_config.add_adapter_in_self_attention
@@ -678,7 +678,7 @@ class T5LayerCrossAttention(nn.Module):
         super().__init__()
         self.EncDecAttention = T5Attention(config, has_relative_attention_bias=False, adapter_config=adapter_config)
         if adapter_config is not None and adapter_config.use_TTLayerNorm:
-            self.layer_norm = TTLayerNorm(config.d_model, 1, tt_rank=config.TTLayerNorm_rk, eps=config.layer_norm_epsilon)
+            self.layer_norm = TTLayerNorm(config.d_model, 1, tt_rank=adapter_config.TTLayerNorm_rk, eps=config.layer_norm_epsilon)
         else:
             self.layer_norm = T5LayerNorm(config.d_model, eps=config.layer_norm_epsilon, adapter_config=adapter_config)
         self.dropout = nn.Dropout(config.dropout_rate)
@@ -1329,7 +1329,7 @@ class T5Stack(T5PreTrainedModel):
                      adapter_config=adapter_config) for i in range(config.num_layers)]
         )
         if adapter_config is not None and adapter_config.use_TTLayerNorm:
-            self.final_layer_norm = TTLayerNorm(config.d_model, 1, tt_rank=config.TTLayerNorm_rk, eps=config.layer_norm_epsilon)
+            self.final_layer_norm = TTLayerNorm(config.d_model, 1, tt_rank=adapter_config.TTLayerNorm_rk, eps=config.layer_norm_epsilon)
         else:
             self.final_layer_norm = T5LayerNorm(config.d_model, eps=config.layer_norm_epsilon)
         self.dropout = nn.Dropout(config.dropout_rate)
