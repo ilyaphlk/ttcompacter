@@ -926,388 +926,7 @@ class T5PreTrainedModel(PreTrainedModel):
         return shifted_input_ids
 
 
-    @classmethod
-    def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], *model_args, adapter_config=None, **kwargs):
-        r"""
-        Instantiate a pretrained pytorch model from a pre-trained model configuration.
-
-        The model is set in evaluation mode by default using ``model.eval()`` (Dropout modules are deactivated). To
-        train the model, you should first set it back in training mode with ``model.train()``.
-
-        The warning `Weights from XXX not initialized from pretrained model` means that the weights of XXX do not come
-        pretrained with the rest of the model. It is up to you to train those weights with a downstream fine-tuning
-        task.
-
-        The warning `Weights from XXX not used in YYY` means that the layer XXX is not used by YYY, therefore those
-        weights are discarded.
-
-        Parameters:
-            pretrained_model_name_or_path (:obj:`str` or :obj:`os.PathLike`, `optional`):
-                Can be either:
-
-                    - A string, the `model id` of a pretrained model hosted inside a model repo on huggingface.co.
-                      Valid model ids can be located at the root-level, like ``bert-base-uncased``, or namespaced under
-                      a user or organization name, like ``dbmdz/bert-base-german-cased``.
-                    - A path to a `directory` containing model weights saved using
-                      :func:`~transformers.PreTrainedModel.save_pretrained`, e.g., ``./my_model_directory/``.
-                    - A path or url to a `tensorflow index checkpoint file` (e.g, ``./tf_model/model.ckpt.index``). In
-                      this case, ``from_tf`` should be set to :obj:`True` and a configuration object should be provided
-                      as ``config`` argument. This loading path is slower than converting the TensorFlow checkpoint in
-                      a PyTorch model using the provided conversion scripts and loading the PyTorch model afterwards.
-                    - A path or url to a model folder containing a `flax checkpoint file` in `.msgpack` format (e.g,
-                      ``./flax_model/`` containing ``flax_model.msgpack``). In this case, ``from_flax`` should be set
-                      to :obj:`True`.
-                    - :obj:`None` if you are both providing the configuration and state dictionary (resp. with keyword
-                      arguments ``config`` and ``state_dict``).
-            model_args (sequence of positional arguments, `optional`):
-                All remaning positional arguments will be passed to the underlying model's ``__init__`` method.
-            config (:obj:`Union[PretrainedConfig, str, os.PathLike]`, `optional`):
-                Can be either:
-
-                    - an instance of a class derived from :class:`~transformers.PretrainedConfig`,
-                    - a string or path valid as input to :func:`~transformers.PretrainedConfig.from_pretrained`.
-
-                Configuration for the model to use instead of an automatically loaded configuation. Configuration can
-                be automatically loaded when:
-
-                    - The model is a model provided by the library (loaded with the `model id` string of a pretrained
-                      model).
-                    - The model was saved using :func:`~transformers.PreTrainedModel.save_pretrained` and is reloaded
-                      by supplying the save directory.
-                    - The model is loaded by supplying a local directory as ``pretrained_model_name_or_path`` and a
-                      configuration JSON file named `config.json` is found in the directory.
-            state_dict (:obj:`Dict[str, torch.Tensor]`, `optional`):
-                A state dictionary to use instead of a state dictionary loaded from saved weights file.
-
-                This option can be used if you want to create a model from a pretrained configuration but load your own
-                weights. In this case though, you should check if using
-                :func:`~transformers.PreTrainedModel.save_pretrained` and
-                :func:`~transformers.PreTrainedModel.from_pretrained` is not a simpler option.
-            cache_dir (:obj:`Union[str, os.PathLike]`, `optional`):
-                Path to a directory in which a downloaded pretrained model configuration should be cached if the
-                standard cache should not be used.
-            from_tf (:obj:`bool`, `optional`, defaults to :obj:`False`):
-                Load the model weights from a TensorFlow checkpoint save file (see docstring of
-                ``pretrained_model_name_or_path`` argument).
-            from_flax (:obj:`bool`, `optional`, defaults to :obj:`False`):
-                Load the model weights from a Flax checkpoint save file (see docstring of
-                ``pretrained_model_name_or_path`` argument).
-            force_download (:obj:`bool`, `optional`, defaults to :obj:`False`):
-                Whether or not to force the (re-)download of the model weights and configuration files, overriding the
-                cached versions if they exist.
-            resume_download (:obj:`bool`, `optional`, defaults to :obj:`False`):
-                Whether or not to delete incompletely received files. Will attempt to resume the download if such a
-                file exists.
-            proxies (:obj:`Dict[str, str], `optional`):
-                A dictionary of proxy servers to use by protocol or endpoint, e.g., :obj:`{'http': 'foo.bar:3128',
-                'http://hostname': 'foo.bar:4012'}`. The proxies are used on each request.
-            output_loading_info(:obj:`bool`, `optional`, defaults to :obj:`False`):
-                Whether ot not to also return a dictionary containing missing keys, unexpected keys and error messages.
-            local_files_only(:obj:`bool`, `optional`, defaults to :obj:`False`):
-                Whether or not to only look at local files (i.e., do not try to download the model).
-            use_auth_token (:obj:`str` or `bool`, `optional`):
-                The token to use as HTTP bearer authorization for remote files. If :obj:`True`, will use the token
-                generated when running :obj:`transformers-cli login` (stored in :obj:`~/.huggingface`).
-            revision(:obj:`str`, `optional`, defaults to :obj:`"main"`):
-                The specific model version to use. It can be a branch name, a tag name, or a commit id, since we use a
-                git-based system for storing models and other artifacts on huggingface.co, so ``revision`` can be any
-                identifier allowed by git.
-            mirror(:obj:`str`, `optional`):
-                Mirror source to accelerate downloads in China. If you are from China and have an accessibility
-                problem, you can set this option to resolve it. Note that we do not guarantee the timeliness or safety.
-                Please refer to the mirror site for more information.
-            _fast_init(:obj:`bool`, `optional`, defaults to `:obj:`True`):
-                Whether or not to disable fast initialization.
-
-                .. warning::
-
-                    One should only disable `_fast_init` to ensure backwards compatibility with
-                    ``transformers.__version__ < 4.6.0`` for seeded model initialization. This argument will be removed
-                    at the next major version. See `pull request 11471
-                    <https://github.com/huggingface/transformers/pull/11471>`__ for more information.
-
-            kwargs (remaining dictionary of keyword arguments, `optional`):
-                Can be used to update the configuration object (after it being loaded) and initiate the model (e.g.,
-                :obj:`output_attentions=True`). Behaves differently depending on whether a ``config`` is provided or
-                automatically loaded:
-
-                    - If a configuration is provided with ``config``, ``**kwargs`` will be directly passed to the
-                      underlying model's ``__init__`` method (we assume all relevant updates to the configuration have
-                      already been done)
-                    - If a configuration is not provided, ``kwargs`` will be first passed to the configuration class
-                      initialization function (:func:`~transformers.PretrainedConfig.from_pretrained`). Each key of
-                      ``kwargs`` that corresponds to a configuration attribute will be used to override said attribute
-                      with the supplied ``kwargs`` value. Remaining keys that do not correspond to any configuration
-                      attribute will be passed to the underlying model's ``__init__`` function.
-
-        .. note::
-
-            Passing :obj:`use_auth_token=True` is required when you want to use a private model.
-
-        .. note::
-
-            Activate the special `"offline-mode"
-            <https://huggingface.co/transformers/installation.html#offline-mode>`__ to use this method in a firewalled
-            environment.
-
-        Examples::
-
-            >>> from transformers import BertConfig, BertModel
-            >>> # Download model and configuration from huggingface.co and cache.
-            >>> model = BertModel.from_pretrained('bert-base-uncased')
-            >>> # Model was saved using `save_pretrained('./test/saved_model/')` (for example purposes, not runnable).
-            >>> model = BertModel.from_pretrained('./test/saved_model/')
-            >>> # Update configuration during loading.
-            >>> model = BertModel.from_pretrained('bert-base-uncased', output_attentions=True)
-            >>> assert model.config.output_attentions == True
-            >>> # Loading from a TF checkpoint file instead of a PyTorch model (slower, for example purposes, not runnable).
-            >>> config = BertConfig.from_json_file('./tf_model/my_tf_model_config.json')
-            >>> model = BertModel.from_pretrained('./tf_model/my_tf_checkpoint.ckpt.index', from_tf=True, config=config)
-            >>> # Loading from a Flax checkpoint file instead of a PyTorch model (slower)
-            >>> model = BertModel.from_pretrained('bert-base-uncased', from_flax=True)
-
-        """
-        config = kwargs.pop("config", None)
-        state_dict = kwargs.pop("state_dict", None)
-        cache_dir = kwargs.pop("cache_dir", None)
-        from_tf = kwargs.pop("from_tf", False)
-        from_flax = kwargs.pop("from_flax", False)
-        force_download = kwargs.pop("force_download", False)
-        resume_download = kwargs.pop("resume_download", False)
-        proxies = kwargs.pop("proxies", None)
-        output_loading_info = kwargs.pop("output_loading_info", False)
-        local_files_only = kwargs.pop("local_files_only", False)
-        use_auth_token = kwargs.pop("use_auth_token", None)
-        revision = kwargs.pop("revision", None)
-        mirror = kwargs.pop("mirror", None)
-        from_pipeline = kwargs.pop("_from_pipeline", None)
-        from_auto_class = kwargs.pop("_from_auto", False)
-        _fast_init = kwargs.pop("_fast_init", True)
-
-        user_agent = {"file_type": "model", "framework": "pytorch", "from_auto_class": from_auto_class}
-        if from_pipeline is not None:
-            user_agent["using_pipeline"] = from_pipeline
-
-        if is_offline_mode() and not local_files_only:
-            logger.info("Offline mode: forcing local_files_only=True")
-            local_files_only = True
-
-        # Load config if we don't provide a configuration
-        if not isinstance(config, PretrainedConfig):
-            config_path = config if config is not None else pretrained_model_name_or_path
-            config, model_kwargs = cls.config_class.from_pretrained(
-                config_path,
-                *model_args,
-                cache_dir=cache_dir,
-                return_unused_kwargs=True,
-                force_download=force_download,
-                resume_download=resume_download,
-                proxies=proxies,
-                local_files_only=local_files_only,
-                use_auth_token=use_auth_token,
-                revision=revision,
-                _from_auto=from_auto_class,
-                _from_pipeline=from_pipeline,
-                **kwargs,
-            )
-        else:
-            model_kwargs = kwargs
-
-
-        print("MODEL KWARGS:")
-        print(model_kwargs)
-
-        # Load model
-        if pretrained_model_name_or_path is not None:
-            print("in if pretrained_model_name_or_path")
-            pretrained_model_name_or_path = str(pretrained_model_name_or_path)
-            if os.path.isdir(pretrained_model_name_or_path):
-                print("in if isdir")
-                if from_tf and os.path.isfile(os.path.join(pretrained_model_name_or_path, TF_WEIGHTS_NAME + ".index")):
-                    # Load from a TF 1.0 checkpoint in priority if from_tf
-                    print("in 1")
-                    archive_file = os.path.join(pretrained_model_name_or_path, TF_WEIGHTS_NAME + ".index")
-                elif from_tf and os.path.isfile(os.path.join(pretrained_model_name_or_path, TF2_WEIGHTS_NAME)):
-                    print("in 2")
-                    # Load from a TF 2.0 checkpoint in priority if from_tf
-                    archive_file = os.path.join(pretrained_model_name_or_path, TF2_WEIGHTS_NAME)
-                elif from_flax and os.path.isfile(os.path.join(pretrained_model_name_or_path, FLAX_WEIGHTS_NAME)):
-                    print("in 3")
-                    # Load from a Flax checkpoint in priority if from_flax
-                    archive_file = os.path.join(pretrained_model_name_or_path, FLAX_WEIGHTS_NAME)
-                elif os.path.isfile(os.path.join(pretrained_model_name_or_path, WEIGHTS_NAME)):
-                    print("in 4")
-                    # Load from a PyTorch checkpoint
-                    archive_file = os.path.join(pretrained_model_name_or_path, WEIGHTS_NAME)
-                else:
-                    raise EnvironmentError(
-                        f"Error no file named {[WEIGHTS_NAME, TF2_WEIGHTS_NAME, TF_WEIGHTS_NAME + '.index', FLAX_WEIGHTS_NAME]} found in "
-                        f"directory {pretrained_model_name_or_path} or `from_tf` and `from_flax` set to False."
-                    )
-            elif os.path.isfile(pretrained_model_name_or_path) or is_remote_url(pretrained_model_name_or_path):
-                print("in 5")
-                archive_file = pretrained_model_name_or_path
-            elif os.path.isfile(pretrained_model_name_or_path + ".index"):
-                print("in 6")
-                if not from_tf:
-                    raise ValueError(
-                        f"We found a TensorFlow checkpoint at {pretrained_model_name_or_path + '.index'}, please set "
-                        "from_tf to True to load from this checkpoint."
-                    )
-                archive_file = pretrained_model_name_or_path + ".index"
-            else:
-                # set correct filename
-                print("in 6.5")
-                if from_tf:
-                    print("in 7")
-                    filename = TF2_WEIGHTS_NAME
-                elif from_flax:
-                    print("in 8")
-                    filename = FLAX_WEIGHTS_NAME
-                else:
-                    print("in 9")
-                    filename = WEIGHTS_NAME
-
-                archive_file = hf_bucket_url(
-                    pretrained_model_name_or_path,
-                    filename=filename,
-                    revision=revision,
-                    mirror=mirror,
-                )
-
-            try:
-                print("in 10")
-                # Load from URL or cache if already cached
-                resolved_archive_file = cached_path(
-                    archive_file,
-                    cache_dir=cache_dir,
-                    force_download=force_download,
-                    proxies=proxies,
-                    resume_download=resume_download,
-                    local_files_only=local_files_only,
-                    use_auth_token=use_auth_token,
-                    user_agent=user_agent,
-                )
-            except EnvironmentError as err:
-                logger.error(err)
-                msg = (
-                    f"Can't load weights for '{pretrained_model_name_or_path}'. Make sure that:\n\n"
-                    f"- '{pretrained_model_name_or_path}' is a correct model identifier listed on 'https://huggingface.co/models'\n\n"
-                    f"- or '{pretrained_model_name_or_path}' is the correct path to a directory containing a file named one of {WEIGHTS_NAME}, {TF2_WEIGHTS_NAME}, {TF_WEIGHTS_NAME}.\n\n"
-                )
-                raise EnvironmentError(msg)
-
-            if resolved_archive_file == archive_file:
-                logger.info(f"loading weights file {archive_file}")
-            else:
-                logger.info(f"loading weights file {archive_file} from cache at {resolved_archive_file}")
-        else:
-            print("in 11")
-            resolved_archive_file = None
-
-        config.name_or_path = pretrained_model_name_or_path
-
-        # Instantiate model.
-        if is_deepspeed_zero3_enabled():
-            import deepspeed
-
-            logger.info("Detected DeepSpeed ZeRO-3: activating zero.init() for this model")
-            # this immediately partitions the model across all gpus, to avoid the overhead in time
-            # and memory copying it on CPU or each GPU first
-            with deepspeed.zero.Init(config=deepspeed_config()):
-                with no_init_weights(_enable=_fast_init):
-                    model = cls(config, *model_args, **model_kwargs)
-        else:
-            with no_init_weights(_enable=_fast_init):
-                model = cls(config, *model_args, **model_kwargs)
-
-        if from_tf:
-            print("FROM TF")
-            print("resolved archive_file:", resolved_archive_file)
-            if resolved_archive_file.endswith(".index"):
-                print("USING OUR load_tf_weights")
-                # Load from a TensorFlow 1.X checkpoint - provided by original authors
-                model, unused_weights = cls.load_tf_weights(model, config, resolved_archive_file[:-6])  # Remove the '.index'
-            else:
-                # Load from our TensorFlow 2.0 checkpoints
-                print("LOADING FROM 2")
-                try:
-                    from transformers.modeling_tf_pytorch_utils import load_tf2_checkpoint_in_pytorch_model
-
-                    model = load_tf2_checkpoint_in_pytorch_model(model, resolved_archive_file, allow_missing_keys=True)
-                except ImportError:
-                    logger.error(
-                        "Loading a TensorFlow model in PyTorch, requires both PyTorch and TensorFlow to be installed. Please see "
-                        "https://pytorch.org/ and https://www.tensorflow.org/install/ for installation instructions."
-                    )
-                    raise
-        elif from_flax:
-            print("in 12")
-            try:
-                from .modeling_flax_pytorch_utils import load_flax_checkpoint_in_pytorch_model
-
-                model = load_flax_checkpoint_in_pytorch_model(model, resolved_archive_file)
-            except ImportError:
-                logger.error(
-                    "Loading a Flax model in PyTorch, requires both PyTorch and Flax to be installed. Please see "
-                    "https://pytorch.org/ and https://flax.readthedocs.io/en/latest/installation.html for installation instructions."
-                )
-                raise
-        else:
-            print("in 13")
-            if state_dict is None:
-                try:
-                    state_dict = torch.load(resolved_archive_file, map_location="cpu")
-                except Exception:
-                    raise OSError(
-                        f"Unable to load weights from pytorch checkpoint file for '{pretrained_model_name_or_path}' "
-                        f"at '{resolved_archive_file}'"
-                        "If you tried to load a PyTorch model from a TF 2.0 checkpoint, please set from_tf=True. "
-                    )
-
-            model, missing_keys, unexpected_keys, error_msgs = cls._load_state_dict_into_model(
-                model, state_dict, pretrained_model_name_or_path, _fast_init=_fast_init
-            )
-            
-            if adapter_config.use_TTLayerNorm and adapter_config.TTLayerNorm_preinit:
-                #try setting weights here
-                unused_weights = {k:state_dict[k] for k in unexpected_keys}
-                print("missing_keys:", len(missing_keys))
-                print("unexpected_keys:", len(unexpected_keys))
-
-                #ln_shape = [8,8,12]
-                ln_shape = auto_shape(768, 3)  # d_model, n_cores #TODO read n_cores from config?
-
-                for k, v in unused_weights.items():
-                    tt_weight = ttpy.tensor(v.data.numpy().reshape(*ln_shape), 1e-4, rmax=adapter_config.TTLayerNorm_rk) # todo: make shape, rank consistent with model init
-                    tt_cores = ttpy.tensor.to_list(tt_weight)
-                    tt_cores = [np.expand_dims(tt_core, 2) for tt_core in tt_cores]
-                    ln = TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False)
-                    for p_name, p in ln.named_parameters():
-                        nk = k[:-7] + '.' + p_name
-                        state_dict[nk] = p
-
-                model, missing_keys, unexpected_keys, error_msgs = cls._load_state_dict_into_model(
-                    model, state_dict, pretrained_model_name_or_path, _fast_init=_fast_init
-                )
-
-        # make sure token embedding weights are still tied if needed
-        model.tie_weights()
-
-        # Set model in evaluation mode to deactivate DropOut modules by default
-        model.eval()
-
-        if output_loading_info:
-            loading_info = {
-                "missing_keys": missing_keys,
-                "unexpected_keys": unexpected_keys,
-                "error_msgs": error_msgs,
-            }
-            return model, loading_info
-
-        return model
-
-
+    
 class T5Stack(T5PreTrainedModel):
     def __init__(self, config, embed_tokens=None, adapter_config=None, prefix_emb=None):
         super().__init__(config)
@@ -2076,6 +1695,390 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
         self.model_parallel = False
         self.device_map = None
  
+
+    @classmethod
+    def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], *model_args, **kwargs):
+        r"""
+        Instantiate a pretrained pytorch model from a pre-trained model configuration.
+
+        The model is set in evaluation mode by default using ``model.eval()`` (Dropout modules are deactivated). To
+        train the model, you should first set it back in training mode with ``model.train()``.
+
+        The warning `Weights from XXX not initialized from pretrained model` means that the weights of XXX do not come
+        pretrained with the rest of the model. It is up to you to train those weights with a downstream fine-tuning
+        task.
+
+        The warning `Weights from XXX not used in YYY` means that the layer XXX is not used by YYY, therefore those
+        weights are discarded.
+
+        Parameters:
+            pretrained_model_name_or_path (:obj:`str` or :obj:`os.PathLike`, `optional`):
+                Can be either:
+
+                    - A string, the `model id` of a pretrained model hosted inside a model repo on huggingface.co.
+                      Valid model ids can be located at the root-level, like ``bert-base-uncased``, or namespaced under
+                      a user or organization name, like ``dbmdz/bert-base-german-cased``.
+                    - A path to a `directory` containing model weights saved using
+                      :func:`~transformers.PreTrainedModel.save_pretrained`, e.g., ``./my_model_directory/``.
+                    - A path or url to a `tensorflow index checkpoint file` (e.g, ``./tf_model/model.ckpt.index``). In
+                      this case, ``from_tf`` should be set to :obj:`True` and a configuration object should be provided
+                      as ``config`` argument. This loading path is slower than converting the TensorFlow checkpoint in
+                      a PyTorch model using the provided conversion scripts and loading the PyTorch model afterwards.
+                    - A path or url to a model folder containing a `flax checkpoint file` in `.msgpack` format (e.g,
+                      ``./flax_model/`` containing ``flax_model.msgpack``). In this case, ``from_flax`` should be set
+                      to :obj:`True`.
+                    - :obj:`None` if you are both providing the configuration and state dictionary (resp. with keyword
+                      arguments ``config`` and ``state_dict``).
+            model_args (sequence of positional arguments, `optional`):
+                All remaning positional arguments will be passed to the underlying model's ``__init__`` method.
+            config (:obj:`Union[PretrainedConfig, str, os.PathLike]`, `optional`):
+                Can be either:
+
+                    - an instance of a class derived from :class:`~transformers.PretrainedConfig`,
+                    - a string or path valid as input to :func:`~transformers.PretrainedConfig.from_pretrained`.
+
+                Configuration for the model to use instead of an automatically loaded configuation. Configuration can
+                be automatically loaded when:
+
+                    - The model is a model provided by the library (loaded with the `model id` string of a pretrained
+                      model).
+                    - The model was saved using :func:`~transformers.PreTrainedModel.save_pretrained` and is reloaded
+                      by supplying the save directory.
+                    - The model is loaded by supplying a local directory as ``pretrained_model_name_or_path`` and a
+                      configuration JSON file named `config.json` is found in the directory.
+            state_dict (:obj:`Dict[str, torch.Tensor]`, `optional`):
+                A state dictionary to use instead of a state dictionary loaded from saved weights file.
+
+                This option can be used if you want to create a model from a pretrained configuration but load your own
+                weights. In this case though, you should check if using
+                :func:`~transformers.PreTrainedModel.save_pretrained` and
+                :func:`~transformers.PreTrainedModel.from_pretrained` is not a simpler option.
+            cache_dir (:obj:`Union[str, os.PathLike]`, `optional`):
+                Path to a directory in which a downloaded pretrained model configuration should be cached if the
+                standard cache should not be used.
+            from_tf (:obj:`bool`, `optional`, defaults to :obj:`False`):
+                Load the model weights from a TensorFlow checkpoint save file (see docstring of
+                ``pretrained_model_name_or_path`` argument).
+            from_flax (:obj:`bool`, `optional`, defaults to :obj:`False`):
+                Load the model weights from a Flax checkpoint save file (see docstring of
+                ``pretrained_model_name_or_path`` argument).
+            force_download (:obj:`bool`, `optional`, defaults to :obj:`False`):
+                Whether or not to force the (re-)download of the model weights and configuration files, overriding the
+                cached versions if they exist.
+            resume_download (:obj:`bool`, `optional`, defaults to :obj:`False`):
+                Whether or not to delete incompletely received files. Will attempt to resume the download if such a
+                file exists.
+            proxies (:obj:`Dict[str, str], `optional`):
+                A dictionary of proxy servers to use by protocol or endpoint, e.g., :obj:`{'http': 'foo.bar:3128',
+                'http://hostname': 'foo.bar:4012'}`. The proxies are used on each request.
+            output_loading_info(:obj:`bool`, `optional`, defaults to :obj:`False`):
+                Whether ot not to also return a dictionary containing missing keys, unexpected keys and error messages.
+            local_files_only(:obj:`bool`, `optional`, defaults to :obj:`False`):
+                Whether or not to only look at local files (i.e., do not try to download the model).
+            use_auth_token (:obj:`str` or `bool`, `optional`):
+                The token to use as HTTP bearer authorization for remote files. If :obj:`True`, will use the token
+                generated when running :obj:`transformers-cli login` (stored in :obj:`~/.huggingface`).
+            revision(:obj:`str`, `optional`, defaults to :obj:`"main"`):
+                The specific model version to use. It can be a branch name, a tag name, or a commit id, since we use a
+                git-based system for storing models and other artifacts on huggingface.co, so ``revision`` can be any
+                identifier allowed by git.
+            mirror(:obj:`str`, `optional`):
+                Mirror source to accelerate downloads in China. If you are from China and have an accessibility
+                problem, you can set this option to resolve it. Note that we do not guarantee the timeliness or safety.
+                Please refer to the mirror site for more information.
+            _fast_init(:obj:`bool`, `optional`, defaults to `:obj:`True`):
+                Whether or not to disable fast initialization.
+
+                .. warning::
+
+                    One should only disable `_fast_init` to ensure backwards compatibility with
+                    ``transformers.__version__ < 4.6.0`` for seeded model initialization. This argument will be removed
+                    at the next major version. See `pull request 11471
+                    <https://github.com/huggingface/transformers/pull/11471>`__ for more information.
+
+            kwargs (remaining dictionary of keyword arguments, `optional`):
+                Can be used to update the configuration object (after it being loaded) and initiate the model (e.g.,
+                :obj:`output_attentions=True`). Behaves differently depending on whether a ``config`` is provided or
+                automatically loaded:
+
+                    - If a configuration is provided with ``config``, ``**kwargs`` will be directly passed to the
+                      underlying model's ``__init__`` method (we assume all relevant updates to the configuration have
+                      already been done)
+                    - If a configuration is not provided, ``kwargs`` will be first passed to the configuration class
+                      initialization function (:func:`~transformers.PretrainedConfig.from_pretrained`). Each key of
+                      ``kwargs`` that corresponds to a configuration attribute will be used to override said attribute
+                      with the supplied ``kwargs`` value. Remaining keys that do not correspond to any configuration
+                      attribute will be passed to the underlying model's ``__init__`` function.
+
+        .. note::
+
+            Passing :obj:`use_auth_token=True` is required when you want to use a private model.
+
+        .. note::
+
+            Activate the special `"offline-mode"
+            <https://huggingface.co/transformers/installation.html#offline-mode>`__ to use this method in a firewalled
+            environment.
+
+        Examples::
+
+            >>> from transformers import BertConfig, BertModel
+            >>> # Download model and configuration from huggingface.co and cache.
+            >>> model = BertModel.from_pretrained('bert-base-uncased')
+            >>> # Model was saved using `save_pretrained('./test/saved_model/')` (for example purposes, not runnable).
+            >>> model = BertModel.from_pretrained('./test/saved_model/')
+            >>> # Update configuration during loading.
+            >>> model = BertModel.from_pretrained('bert-base-uncased', output_attentions=True)
+            >>> assert model.config.output_attentions == True
+            >>> # Loading from a TF checkpoint file instead of a PyTorch model (slower, for example purposes, not runnable).
+            >>> config = BertConfig.from_json_file('./tf_model/my_tf_model_config.json')
+            >>> model = BertModel.from_pretrained('./tf_model/my_tf_checkpoint.ckpt.index', from_tf=True, config=config)
+            >>> # Loading from a Flax checkpoint file instead of a PyTorch model (slower)
+            >>> model = BertModel.from_pretrained('bert-base-uncased', from_flax=True)
+
+        """
+        config = kwargs.pop("config", None)
+        state_dict = kwargs.pop("state_dict", None)
+        cache_dir = kwargs.pop("cache_dir", None)
+        from_tf = kwargs.pop("from_tf", False)
+        from_flax = kwargs.pop("from_flax", False)
+        force_download = kwargs.pop("force_download", False)
+        resume_download = kwargs.pop("resume_download", False)
+        proxies = kwargs.pop("proxies", None)
+        output_loading_info = kwargs.pop("output_loading_info", False)
+        local_files_only = kwargs.pop("local_files_only", False)
+        use_auth_token = kwargs.pop("use_auth_token", None)
+        revision = kwargs.pop("revision", None)
+        mirror = kwargs.pop("mirror", None)
+        from_pipeline = kwargs.pop("_from_pipeline", None)
+        from_auto_class = kwargs.pop("_from_auto", False)
+        _fast_init = kwargs.pop("_fast_init", True)
+
+        user_agent = {"file_type": "model", "framework": "pytorch", "from_auto_class": from_auto_class}
+        if from_pipeline is not None:
+            user_agent["using_pipeline"] = from_pipeline
+
+        if is_offline_mode() and not local_files_only:
+            logger.info("Offline mode: forcing local_files_only=True")
+            local_files_only = True
+
+        # Load config if we don't provide a configuration
+        if not isinstance(config, PretrainedConfig):
+            config_path = config if config is not None else pretrained_model_name_or_path
+            config, model_kwargs = cls.config_class.from_pretrained(
+                config_path,
+                *model_args,
+                cache_dir=cache_dir,
+                return_unused_kwargs=True,
+                force_download=force_download,
+                resume_download=resume_download,
+                proxies=proxies,
+                local_files_only=local_files_only,
+                use_auth_token=use_auth_token,
+                revision=revision,
+                _from_auto=from_auto_class,
+                _from_pipeline=from_pipeline,
+                **kwargs,
+            )
+        else:
+            model_kwargs = kwargs
+
+
+        print("MODEL KWARGS:")
+        print(model_kwargs)
+
+        # Load model
+        if pretrained_model_name_or_path is not None:
+            print("in if pretrained_model_name_or_path")
+            pretrained_model_name_or_path = str(pretrained_model_name_or_path)
+            if os.path.isdir(pretrained_model_name_or_path):
+                print("in if isdir")
+                if from_tf and os.path.isfile(os.path.join(pretrained_model_name_or_path, TF_WEIGHTS_NAME + ".index")):
+                    # Load from a TF 1.0 checkpoint in priority if from_tf
+                    print("in 1")
+                    archive_file = os.path.join(pretrained_model_name_or_path, TF_WEIGHTS_NAME + ".index")
+                elif from_tf and os.path.isfile(os.path.join(pretrained_model_name_or_path, TF2_WEIGHTS_NAME)):
+                    print("in 2")
+                    # Load from a TF 2.0 checkpoint in priority if from_tf
+                    archive_file = os.path.join(pretrained_model_name_or_path, TF2_WEIGHTS_NAME)
+                elif from_flax and os.path.isfile(os.path.join(pretrained_model_name_or_path, FLAX_WEIGHTS_NAME)):
+                    print("in 3")
+                    # Load from a Flax checkpoint in priority if from_flax
+                    archive_file = os.path.join(pretrained_model_name_or_path, FLAX_WEIGHTS_NAME)
+                elif os.path.isfile(os.path.join(pretrained_model_name_or_path, WEIGHTS_NAME)):
+                    print("in 4")
+                    # Load from a PyTorch checkpoint
+                    archive_file = os.path.join(pretrained_model_name_or_path, WEIGHTS_NAME)
+                else:
+                    raise EnvironmentError(
+                        f"Error no file named {[WEIGHTS_NAME, TF2_WEIGHTS_NAME, TF_WEIGHTS_NAME + '.index', FLAX_WEIGHTS_NAME]} found in "
+                        f"directory {pretrained_model_name_or_path} or `from_tf` and `from_flax` set to False."
+                    )
+            elif os.path.isfile(pretrained_model_name_or_path) or is_remote_url(pretrained_model_name_or_path):
+                print("in 5")
+                archive_file = pretrained_model_name_or_path
+            elif os.path.isfile(pretrained_model_name_or_path + ".index"):
+                print("in 6")
+                if not from_tf:
+                    raise ValueError(
+                        f"We found a TensorFlow checkpoint at {pretrained_model_name_or_path + '.index'}, please set "
+                        "from_tf to True to load from this checkpoint."
+                    )
+                archive_file = pretrained_model_name_or_path + ".index"
+            else:
+                # set correct filename
+                print("in 6.5")
+                if from_tf:
+                    print("in 7")
+                    filename = TF2_WEIGHTS_NAME
+                elif from_flax:
+                    print("in 8")
+                    filename = FLAX_WEIGHTS_NAME
+                else:
+                    print("in 9")
+                    filename = WEIGHTS_NAME
+
+                archive_file = hf_bucket_url(
+                    pretrained_model_name_or_path,
+                    filename=filename,
+                    revision=revision,
+                    mirror=mirror,
+                )
+
+            try:
+                print("in 10")
+                # Load from URL or cache if already cached
+                resolved_archive_file = cached_path(
+                    archive_file,
+                    cache_dir=cache_dir,
+                    force_download=force_download,
+                    proxies=proxies,
+                    resume_download=resume_download,
+                    local_files_only=local_files_only,
+                    use_auth_token=use_auth_token,
+                    user_agent=user_agent,
+                )
+            except EnvironmentError as err:
+                logger.error(err)
+                msg = (
+                    f"Can't load weights for '{pretrained_model_name_or_path}'. Make sure that:\n\n"
+                    f"- '{pretrained_model_name_or_path}' is a correct model identifier listed on 'https://huggingface.co/models'\n\n"
+                    f"- or '{pretrained_model_name_or_path}' is the correct path to a directory containing a file named one of {WEIGHTS_NAME}, {TF2_WEIGHTS_NAME}, {TF_WEIGHTS_NAME}.\n\n"
+                )
+                raise EnvironmentError(msg)
+
+            if resolved_archive_file == archive_file:
+                logger.info(f"loading weights file {archive_file}")
+            else:
+                logger.info(f"loading weights file {archive_file} from cache at {resolved_archive_file}")
+        else:
+            print("in 11")
+            resolved_archive_file = None
+
+        config.name_or_path = pretrained_model_name_or_path
+
+        # Instantiate model.
+        if is_deepspeed_zero3_enabled():
+            import deepspeed
+
+            logger.info("Detected DeepSpeed ZeRO-3: activating zero.init() for this model")
+            # this immediately partitions the model across all gpus, to avoid the overhead in time
+            # and memory copying it on CPU or each GPU first
+            with deepspeed.zero.Init(config=deepspeed_config()):
+                with no_init_weights(_enable=_fast_init):
+                    model = cls(config, *model_args, **model_kwargs)
+        else:
+            with no_init_weights(_enable=_fast_init):
+                model = cls(config, *model_args, **model_kwargs)
+
+        if from_tf:
+            print("FROM TF")
+            print("resolved archive_file:", resolved_archive_file)
+            if resolved_archive_file.endswith(".index"):
+                print("USING OUR load_tf_weights")
+                # Load from a TensorFlow 1.X checkpoint - provided by original authors
+                model, unused_weights = cls.load_tf_weights(model, config, resolved_archive_file[:-6])  # Remove the '.index'
+            else:
+                # Load from our TensorFlow 2.0 checkpoints
+                print("LOADING FROM 2")
+                try:
+                    from transformers.modeling_tf_pytorch_utils import load_tf2_checkpoint_in_pytorch_model
+
+                    model = load_tf2_checkpoint_in_pytorch_model(model, resolved_archive_file, allow_missing_keys=True)
+                except ImportError:
+                    logger.error(
+                        "Loading a TensorFlow model in PyTorch, requires both PyTorch and TensorFlow to be installed. Please see "
+                        "https://pytorch.org/ and https://www.tensorflow.org/install/ for installation instructions."
+                    )
+                    raise
+        elif from_flax:
+            print("in 12")
+            try:
+                from .modeling_flax_pytorch_utils import load_flax_checkpoint_in_pytorch_model
+
+                model = load_flax_checkpoint_in_pytorch_model(model, resolved_archive_file)
+            except ImportError:
+                logger.error(
+                    "Loading a Flax model in PyTorch, requires both PyTorch and Flax to be installed. Please see "
+                    "https://pytorch.org/ and https://flax.readthedocs.io/en/latest/installation.html for installation instructions."
+                )
+                raise
+        else:
+            print("in 13")
+            if state_dict is None:
+                try:
+                    state_dict = torch.load(resolved_archive_file, map_location="cpu")
+                except Exception:
+                    raise OSError(
+                        f"Unable to load weights from pytorch checkpoint file for '{pretrained_model_name_or_path}' "
+                        f"at '{resolved_archive_file}'"
+                        "If you tried to load a PyTorch model from a TF 2.0 checkpoint, please set from_tf=True. "
+                    )
+
+            model, missing_keys, unexpected_keys, error_msgs = cls._load_state_dict_into_model(
+                model, state_dict, pretrained_model_name_or_path, _fast_init=_fast_init
+            )
+            
+            if adapter_config.use_TTLayerNorm and adapter_config.TTLayerNorm_preinit:
+                #try setting weights here
+                unused_weights = {k:state_dict[k] for k in unexpected_keys}
+                print("missing_keys:", len(missing_keys))
+                print("unexpected_keys:", len(unexpected_keys))
+
+                #ln_shape = [8,8,12]
+                ln_shape = auto_shape(768, 3)  # d_model, n_cores #TODO read n_cores from config?
+
+                for k, v in unused_weights.items():
+                    tt_weight = ttpy.tensor(v.data.numpy().reshape(*ln_shape), 1e-4, rmax=adapter_config.TTLayerNorm_rk) # todo: make shape, rank consistent with model init
+                    tt_cores = ttpy.tensor.to_list(tt_weight)
+                    tt_cores = [np.expand_dims(tt_core, 2) for tt_core in tt_cores]
+                    ln = TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False)
+                    for p_name, p in ln.named_parameters():
+                        nk = k[:-7] + '.' + p_name
+                        state_dict[nk] = p
+
+                model, missing_keys, unexpected_keys, error_msgs = cls._load_state_dict_into_model(
+                    model, state_dict, pretrained_model_name_or_path, _fast_init=_fast_init
+                )
+
+        # make sure token embedding weights are still tied if needed
+        model.tie_weights()
+
+        # Set model in evaluation mode to deactivate DropOut modules by default
+        model.eval()
+
+        if output_loading_info:
+            loading_info = {
+                "missing_keys": missing_keys,
+                "unexpected_keys": unexpected_keys,
+                "error_msgs": error_msgs,
+            }
+            return model, loading_info
+
+        return model
+
+
+
 
     ###############################################
     def init_prefix_weights(self):
