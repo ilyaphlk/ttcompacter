@@ -1603,7 +1603,7 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
         self.model_dim = config.d_model
         # TODO: we need to init the shared prefix embedding.
         self.shared = nn.Embedding(config.vocab_size, config.d_model)
-        self.adapter_config = adapter_config
+        #self.adapter_config = adapter_config
         #############################################################
         self.prefix_tuning = config.prefix_tuning
         if self.prefix_tuning:
@@ -1854,6 +1854,7 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
         from_pipeline = kwargs.pop("_from_pipeline", None)
         from_auto_class = kwargs.pop("_from_auto", False)
         _fast_init = kwargs.pop("_fast_init", True)
+        adapter_config = kwargs.pop("adapter_config", None)
 
         user_agent = {"file_type": "model", "framework": "pytorch", "from_auto_class": from_auto_class}
         if from_pipeline is not None:
@@ -2040,7 +2041,7 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                 model, state_dict, pretrained_model_name_or_path, _fast_init=_fast_init
             )
             
-            if self.adapter_config.use_TTLayerNorm and self.adapter_config.TTLayerNorm_preinit:
+            if adapter_config.use_TTLayerNorm and adapter_config.TTLayerNorm_preinit:
                 #try setting weights here
                 unused_weights = {k:state_dict[k] for k in unexpected_keys}
                 print("missing_keys:", len(missing_keys))
@@ -2050,7 +2051,7 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                 ln_shape = auto_shape(768, 3)  # d_model, n_cores #TODO read n_cores from config?
 
                 for k, v in unused_weights.items():
-                    tt_weight = ttpy.tensor(v.data.numpy().reshape(*ln_shape), 1e-4, rmax=self.adapter_config.TTLayerNorm_rk) # todo: make shape, rank consistent with model init
+                    tt_weight = ttpy.tensor(v.data.numpy().reshape(*ln_shape), 1e-4, rmax=adapter_config.TTLayerNorm_rk) # todo: make shape, rank consistent with model init
                     tt_cores = ttpy.tensor.to_list(tt_weight)
                     tt_cores = [np.expand_dims(tt_core, 2) for tt_core in tt_cores]
                     ln = TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False)
