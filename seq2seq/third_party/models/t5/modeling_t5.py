@@ -2045,11 +2045,22 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                 model, state_dict, pretrained_model_name_or_path, _fast_init=_fast_init
             )
 
-            sample_miss_key = 'decoder.block.1.layer.2.layer_norm.parameters.2'
-            print("before init\n", model.state_dict()[sample_miss_key])
+            #sample_miss_key = 'decoder.block.1.layer.2.layer_norm.parameters.2'
+            #print("before init\n", model.state_dict()[sample_miss_key])
+
+            if adapter_config.use_ScaleNorm and adapter_config.use_LayerNorm_mean:
+                for k in state_dict.keys():
+                    if "layer_norm" in k:
+                        ln = T5LayerNorm(768, eps=1e-6, adapter_config=adapter_config, scale_const=state_dict[k].mean())
+                        for p_name, p in ln.named_parameters():
+                            state_dict[k] = p
+
+                model, missing_keys, unexpected_keys, error_msgs = cls._load_state_dict_into_model(
+                    model, state_dict, pretrained_model_name_or_path, _fast_init=_fast_init
+                )
+
             
-            if ((adapter_config.use_TTLayerNorm and adapter_config.TTLayerNorm_preinit) or
-                (adapter_config.use_ScaleNorm   and adapter_config.use_LayerNorm_mean)):
+            if adapter_config.use_TTLayerNorm and adapter_config.TTLayerNorm_preinit:
                 #try setting weights here
                 unused_weights = {k:state_dict[k] for k in unexpected_keys}
                 print("missing_keys:", len(missing_keys))
@@ -2063,9 +2074,7 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                     tt_cores = ttpy.tensor.to_list(tt_weight)
                     tt_cores = [np.expand_dims(tt_core, 2) for tt_core in tt_cores]
 
-                    if adapter_config.use_ScaleNorm:
-                        ln = T5LayerNorm(768, eps=1e-6, adapter_config=adapter_config, scale_const=v.mean())
-                    elif adapter_config.use_LayerNorm_mean:
+                    if adapter_config.use_LayerNorm_mean:
                         ln = TTLayerNorm(768, 1, tt_rank=adapter_config.TTLayerNorm_rk, scale_const=v.mean())
                     else:
                         ln = TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False)
@@ -2076,7 +2085,7 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                 model, missing_keys, unexpected_keys, error_msgs = cls._load_state_dict_into_model(
                     model, state_dict, pretrained_model_name_or_path, _fast_init=_fast_init
                 )
-            print("after init\n", model.state_dict()[sample_miss_key])
+            #print("after init\n", model.state_dict()[sample_miss_key])
 
         # make sure token embedding weights are still tied if needed
         model.tie_weights()
