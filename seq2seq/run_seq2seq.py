@@ -393,7 +393,7 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
         adapter_config=adapter_config,
-        adapter_config_=adapter_config
+        #adapter_config_=adapter_config
     )
     model.resize_token_embeddings(len(tokenizer))
     model, model_info = modify_model_after_init(model, training_args, adapter_args)
