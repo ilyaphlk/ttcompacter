@@ -1270,10 +1270,7 @@ class T5PreTrainedModel(PreTrainedModel):
             )
             unused_weights = {k:state_dict[k] for k in unexpected_keys}
 
-        #try seting weights here
-        print("state_dict_keys:")
-        for k in state_dict.keys():
-            print(k)
+        #try setting weights here
 
         print("missing_keys:", len(missing_keys))
         print("unexpected_keys:", len(unexpected_keys))
@@ -1290,34 +1287,6 @@ class T5PreTrainedModel(PreTrainedModel):
         model, missing_keys, unexpected_keys, error_msgs = cls._load_state_dict_into_model(
             model, state_dict, pretrained_model_name_or_path, _fast_init=_fast_init
         )
-        print("missing_keys:", len(missing_keys))
-        print("unexpected_keys:", len(unexpected_keys))
-
-        #for k, v in unused_weights.items():
-            #print(k)
-            #print(type(v))
-            
-            # tt_weight = ttpy.tensor(v.data.numpy().reshape(8,8,12), 1e-4, rmax=2)
-            # tt_cores = ttpy.tensor.to_list(tt_weight)
-            # tt_cores = [np.expand_dims(tt_core, 2) for tt_core in tt_cores]
-
-            # layer_path = k[:-7]  # cutoff ".weight"
-            # #encoder.block.2.layer.0.layer_norm
-
-            # attr_str = '.'.join(map(lambda x: f'[{x}]' if x.isdigit() else x, layer_path.split('.')))
-            # attr_str = '['.join(attr_str.split('.['))
-
-            # print("old weight:", model._modules[attr_str].tt_cores[0])
-            # #print("old weight:", getattr(model, attr_str+'.weight.tt_cores')[0])
-
-            # #setattr(model, layer_path, TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False))
-
-            # # layer_path = k
-            # # setattr(model, layer_path, TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False).weight)
-            # print("new weight:", getattr(model, attr_str+'.weight.tt_cores')[0])
-
-            # print("old weight:", next(getattr(model, layer_path+'.parameters')()))
-
 
         # make sure token embedding weights are still tied if needed
         model.tie_weights()
@@ -1333,7 +1302,7 @@ class T5PreTrainedModel(PreTrainedModel):
             }
             return model, loading_info
 
-        return model, None #unused_weights
+        return model
 
 
 class T5Stack(T5PreTrainedModel):
