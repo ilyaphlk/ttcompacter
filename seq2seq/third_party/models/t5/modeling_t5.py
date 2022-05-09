@@ -1281,7 +1281,12 @@ class T5PreTrainedModel(PreTrainedModel):
 
             layer_path = k[:-7]  # cutoff ".weight"
             #print("old weight:", next(getattr(model, layer_path+'.parameters')()))
-            print("old path:", getattr(model, layer_path))
+
+
+            #encoder.block.2.layer.0.layer_norm
+
+            print("encoder:\n", getattr(model, 'encoder'))
+            print("block layer:\n", getattr(model, 'encoder.block.2.layer'))
             print("old weight:", getattr(model, layer_path+'.weight.tt_cores')[0])
 
             setattr(model, layer_path, TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False))
