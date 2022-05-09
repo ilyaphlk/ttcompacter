@@ -1270,7 +1270,7 @@ class T5PreTrainedModel(PreTrainedModel):
             )
             unused_weights = {k:state_dict[k] for k in unexpected_keys}
 
-        try seting weights here
+        #try seting weights here
         for k, v in unused_weights.items():
             #print(k)
             #print(type(v))
