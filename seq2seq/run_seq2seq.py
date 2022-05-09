@@ -315,11 +315,15 @@ def main():
     run.config.use_scripted_mul = adapter_args.use_scripted_mul
     run.config.auto_shape_mode = adapter_args.auto_shape_mode
     run.config.tensor_train_single = adapter_args.tensor_train_single
+    
     run.config.use_ScaleNorm = adapter_args.use_ScaleNorm
     run.config.ScaleNorm_scale = adapter_args.ScaleNorm_scale
     run.config.use_TTLayerNorm = adapter_args.use_TTLayerNorm
+    run.config.TTLayerNorm_rk = adapter_args.TTLayerNorm_rk
+    run.config.TTLayerNorm_preinit = adapter_args.TTLayerNorm_preinit
     run.config.use_bias = adapter_args.use_bias
     run.config.use_TTBias = adapter_args.use_TTBias
+    run.config.TTBias_rk = adapter_args.TTBias_rk
 
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
