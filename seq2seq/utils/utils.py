@@ -227,8 +227,8 @@ def init_TTLayerNorms(model, unused_weights):
 
 def modify_model_after_init(model, training_args, adapter_args, run=None, unused_weights=None):
 
-    if adapter_args.use_TTLayerNorm:
-        init_TTLayerNorms(model, unused_weights)
+    # if adapter_args.use_TTLayerNorm:
+    #     init_TTLayerNorms(model, unused_weights)
 
     # Freezes model parameters.
     freeze_model_params(model, adapter_args)

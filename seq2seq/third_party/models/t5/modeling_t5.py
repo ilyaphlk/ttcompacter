@@ -116,7 +116,10 @@ from seq2seq.hypercomplex.layers import  PHMLinear
 from seq2seq.hypercomplex.inits import  glorot_uniform, glorot_normal
 from typing import Dict, Any
 
+import numpy as np
+import tt as ttpy
 from t3nsor.layers import TTLayerNorm
+from t3nsor.tensor_train import TensorTrain
 
 logger = logging.get_logger(__name__)
 
@@ -1267,6 +1270,17 @@ class T5PreTrainedModel(PreTrainedModel):
             )
             unused_weights = {k:state_dict[k] for k in unexpected_keys}
 
+        # try seting weights here
+        for k, v in unused_weights.items():
+            #print(k)
+            #print(type(v))
+            layer_path = k[:-7]  # cutoff ".weight"
+            tt_weight = ttpy.tensor(v.data.numpy().reshape(8,8,12), 1e-4, rmax=2)
+            tt_cores = ttpy.tensor.to_list(tt_weight)
+            tt_cores = [np.expand_dims(tt_core, 2) for tt_core in tt_cores]
+            setattr(model, layer_path, TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False))
+
+
         # make sure token embedding weights are still tied if needed
         model.tie_weights()
 
@@ -1281,7 +1295,7 @@ class T5PreTrainedModel(PreTrainedModel):
             }
             return model, loading_info
 
-        return model, unused_weights
+        return model, None #unused_weights
 
 
 class T5Stack(T5PreTrainedModel):
