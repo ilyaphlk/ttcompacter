@@ -55,5 +55,5 @@
 "ScaleNorm_scale": 1.0,
 "use_TTLayerNorm": true,
 "use_bias": true,
-"use_TTBias": true
+"use_TTBias": false
 }

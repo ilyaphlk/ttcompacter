@@ -220,7 +220,7 @@ def init_TTLayerNorms(model, unused_weights):
         tt_weight = ttpy.tensor(v.data.numpy().reshape(8,8,12), 1e-4, rmax=2)
         tt_cores = ttpy.tensor.to_list(tt_weight)
         tt_cores = [np.expand_dims(tt_core, 2) for tt_core in tt_cores]
-        setattr(model, layer_path, TTLayerNorm(init=TensorTrain(tt_cores)))
+        setattr(model, layer_path, TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False))
 
 
     print("#####################")
