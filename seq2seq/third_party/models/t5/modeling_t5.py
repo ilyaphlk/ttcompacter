@@ -1285,7 +1285,8 @@ class T5PreTrainedModel(PreTrainedModel):
             attr_str = '.'.join(map(lambda x: f'[{x}]' if x.isdigit() else x, layer_path.split('.')))
             attr_str = '['.join(attr_str.split('.['))
 
-            print("old weight:", getattr(model, attr_str+'.weight.tt_cores')[0])
+            print("old weight:", model._modules[attr_str].tt_cores[0])
+            #print("old weight:", getattr(model, attr_str+'.weight.tt_cores')[0])
 
             setattr(model, layer_path, TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False))
 
