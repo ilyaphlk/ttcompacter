@@ -304,13 +304,16 @@ DEPARALLELIZE_DOCSTRING = r"""
 
 
 class T5LayerNorm(nn.Module):
-    def __init__(self, hidden_size, eps=1e-6, adapter_config=None):
+    def __init__(self, hidden_size, eps=1e-6, adapter_config=None, scale_const=None):
         """
         Construct a layernorm module in the T5 style No bias and no subtraction of mean.
         """
         super().__init__()
         if adapter_config is not None and adapter_config.use_ScaleNorm:
-            self.weight = nn.Parameter(torch.tensor(adapter_config.ScaleNorm_scale))
+            if scale_const is None:
+                self.weight = nn.Parameter(torch.tensor(adapter_config.ScaleNorm_scale))
+            else:
+                self.weight = nn.Parameter(torch.tensor(scale_const))
         else:
             self.weight = nn.Parameter(torch.ones(hidden_size))
         self.variance_epsilon = eps
@@ -951,7 +954,7 @@ class T5Stack(T5PreTrainedModel):
         if adapter_config is not None and adapter_config.use_TTLayerNorm:
             self.final_layer_norm = TTLayerNorm(config.d_model, 1, tt_rank=adapter_config.TTLayerNorm_rk, eps=config.layer_norm_epsilon)
         else:
-            self.final_layer_norm = T5LayerNorm(config.d_model, eps=config.layer_norm_epsilon)
+            self.final_layer_norm = T5LayerNorm(config.d_model, eps=config.layer_norm_epsilon, adapter_config=adapter_config)
         self.dropout = nn.Dropout(config.dropout_rate)
 
         self.init_weights()
@@ -2045,7 +2048,8 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
             sample_miss_key = 'decoder.block.1.layer.2.layer_norm.parameters.2'
             print("before init\n", model.state_dict()[sample_miss_key])
             
-            if adapter_config.use_TTLayerNorm and adapter_config.TTLayerNorm_preinit:
+            if ((adapter_config.use_TTLayerNorm and adapter_config.TTLayerNorm_preinit) or
+                (adapter_config.use_ScaleNorm   and adapter_config.use_LayerNorm_mean)):
                 #try setting weights here
                 unused_weights = {k:state_dict[k] for k in unexpected_keys}
                 print("missing_keys:", len(missing_keys))
@@ -2059,7 +2063,9 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                     tt_cores = ttpy.tensor.to_list(tt_weight)
                     tt_cores = [np.expand_dims(tt_core, 2) for tt_core in tt_cores]
 
-                    if adapter_config.use_LayerNorm_mean:
+                    if adapter_config.use_ScaleNorm:
+                        ln = T5LayerNorm(768, eps=1e-6, adapter_config=adapter_config, scale_const=v.mean())
+                    elif adapter_config.use_LayerNorm_mean:
                         ln = TTLayerNorm(768, 1, tt_rank=adapter_config.TTLayerNorm_rk, scale_const=v.mean())
                     else:
                         ln = TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False)
