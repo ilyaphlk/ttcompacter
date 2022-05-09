@@ -285,42 +285,7 @@ def main():
                 "the `--output_dir` or add `--overwrite_output_dir` to train from scratch."
             )
 
-    # Setup logging
-    run = None
-    #wandb.login()
-    exp_name = data_args.task_name + "_" + training_args.experiment_name
-    run = wandb.init(project=training_args.project_name, name=exp_name, entity='i_pakhalko')
-    # for dclass in [model_args, data_args, training_args, adapter_args]:
-    #     attrs = [elem.name for elem in fields(dclass)]
-    #     for attr in attrs:
-    #         setattr(run.config, attr, getattr(dclass, attr))
-
-    run.config.task_name = data_args.task_name
-    run.config.max_source_length = data_args.max_source_length
-    run.config.experiment_name = training_args.experiment_name
-    run.config.num_train_epochs = training_args.num_train_epochs
-    run.config.learning_rate = training_args.learning_rate
-    run.config.warmup_steps = training_args.warmup_steps
-    run.config.batch_size = training_args.per_device_train_batch_size
-    run.config.non_linearity = adapter_args.non_linearity
-    run.config.task_reduction_factor = adapter_args.task_reduction_factor
-    run.config.task_expansion_factor = adapter_args.task_expansion_factor
-    run.config.tensor_train_adapters = adapter_args.tensor_train_adapters
-    run.config.tt_rank = adapter_args.tt_rank
-    run.config.tt_d = adapter_args.tt_d
-    run.config.tt_shape = adapter_args.tt_shape
-    run.config.reverse_out_shape = adapter_args.reverse_out_shape
-    run.config.factorize_smaller_dim = adapter_args.factorize_smaller_dim
-    run.config.cores_nonlinearity = adapter_args.cores_nonlinearity
-    run.config.use_scripted_mul = adapter_args.use_scripted_mul
-    run.config.auto_shape_mode = adapter_args.auto_shape_mode
-    run.config.tensor_train_single = adapter_args.tensor_train_single
-    run.config.use_ScaleNorm = adapter_args.use_ScaleNorm
-    run.config.ScaleNorm_scale = adapter_args.ScaleNorm_scale
-    run.config.use_TTLayerNorm = adapter_args.use_TTLayerNorm
-    run.config.use_bias = adapter_args.use_bias
-    run.config.use_TTBias = adapter_args.use_TTBias
-
+    
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
         datefmt="%m/%d/%Y %H:%M:%S",
@@ -391,6 +356,43 @@ def main():
     )
     model.resize_token_embeddings(len(tokenizer))
     model, model_info = modify_model_after_init(model, training_args, adapter_args, unused_weights=unused_weights)
+
+    # Setup logging
+    run = None
+    #wandb.login()
+    exp_name = data_args.task_name + "_" + training_args.experiment_name
+    run = wandb.init(project=training_args.project_name, name=exp_name, entity='i_pakhalko')
+    # for dclass in [model_args, data_args, training_args, adapter_args]:
+    #     attrs = [elem.name for elem in fields(dclass)]
+    #     for attr in attrs:
+    #         setattr(run.config, attr, getattr(dclass, attr))
+
+    run.config.task_name = data_args.task_name
+    run.config.max_source_length = data_args.max_source_length
+    run.config.experiment_name = training_args.experiment_name
+    run.config.num_train_epochs = training_args.num_train_epochs
+    run.config.learning_rate = training_args.learning_rate
+    run.config.warmup_steps = training_args.warmup_steps
+    run.config.batch_size = training_args.per_device_train_batch_size
+    run.config.non_linearity = adapter_args.non_linearity
+    run.config.task_reduction_factor = adapter_args.task_reduction_factor
+    run.config.task_expansion_factor = adapter_args.task_expansion_factor
+    run.config.tensor_train_adapters = adapter_args.tensor_train_adapters
+    run.config.tt_rank = adapter_args.tt_rank
+    run.config.tt_d = adapter_args.tt_d
+    run.config.tt_shape = adapter_args.tt_shape
+    run.config.reverse_out_shape = adapter_args.reverse_out_shape
+    run.config.factorize_smaller_dim = adapter_args.factorize_smaller_dim
+    run.config.cores_nonlinearity = adapter_args.cores_nonlinearity
+    run.config.use_scripted_mul = adapter_args.use_scripted_mul
+    run.config.auto_shape_mode = adapter_args.auto_shape_mode
+    run.config.tensor_train_single = adapter_args.tensor_train_single
+    run.config.use_ScaleNorm = adapter_args.use_ScaleNorm
+    run.config.ScaleNorm_scale = adapter_args.ScaleNorm_scale
+    run.config.use_TTLayerNorm = adapter_args.use_TTLayerNorm
+    run.config.use_bias = adapter_args.use_bias
+    run.config.use_TTBias = adapter_args.use_TTBias
+
 
     if model_info is not None:
         attrs = [elem.name for elem in fields(model_info)]
