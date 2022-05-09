@@ -927,7 +927,7 @@ class T5PreTrainedModel(PreTrainedModel):
 
 
     @classmethod
-    def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], *model_args, **kwargs):
+    def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], *model_args, adapter_config=None, **kwargs):
         r"""
         Instantiate a pretrained pytorch model from a pre-trained model configuration.
 
