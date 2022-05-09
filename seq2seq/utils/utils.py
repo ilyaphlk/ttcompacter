@@ -4,12 +4,14 @@ import logging
 from dataclasses import dataclass, fields
 import torch.nn as nn
 import json
+import numpy as np
+import tt as ttpy
 
 from seq2seq.adapters import (AutoAdapterConfig, AdapterController, Adapter, HyperComplexAdapter)
 from projections.intrinsic import intrinsic_dimension, intrinsic_dimension_said
 from seq2seq.third_party.models.t5 import T5LayerNorm
 from t3nsor.layers import TTLayerNorm
-
+from t3nsor.tensor_train import TensorTrain
 
 logging.basicConfig(
     filename='std.log',
@@ -212,8 +214,14 @@ def init_TTLayerNorms(model, unused_weights):
     print("unused weights keys:")
 
     for k, v in unused_weights.items():
-        print(k)
-        print(type(v))
+        #print(k)
+        #print(type(v))
+        layer_path = k[:-7]  # cutoff ".weight"
+        tt_weight = ttpy.tensor(v.data.numpy().reshape(8,8,12), 1e-4, rmax=2)
+        tt_cores = ttpy.tensor.to_list(tt_weight)
+        tt_cores = [np.expand_dims(tt_core, 2) for tt_core in tt_cores]
+        setattr(model, layer_path, TTLayerNorm(init=TensorTrain(tt_cores)))
+
 
     print("#####################")
 
