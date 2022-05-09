@@ -2043,7 +2043,7 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
             )
 
             sample_miss_key = 'decoder.block.1.layer.2.layer_norm.parameters.2'
-            print(model.state_dict()[sample_miss_key])
+            print("before init\n", model.state_dict()[sample_miss_key])
             
             if adapter_config.use_TTLayerNorm and adapter_config.TTLayerNorm_preinit:
                 #try setting weights here
@@ -2066,6 +2066,7 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                 model, missing_keys, unexpected_keys, error_msgs = cls._load_state_dict_into_model(
                     model, state_dict, pretrained_model_name_or_path, _fast_init=_fast_init
                 )
+            print("after init\n", model.state_dict()[sample_miss_key])
 
         # make sure token embedding weights are still tied if needed
         model.tie_weights()
