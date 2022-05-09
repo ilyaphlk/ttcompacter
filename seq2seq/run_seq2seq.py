@@ -20,6 +20,7 @@ import functools
 import logging
 import torch 
 import os
+import json
 os.environ['MKL_THREADING_LAYER'] = 'GNU' 
 os.environ['MKL_SERVICE_FORCE_INTEL'] = '1'
 import sys
@@ -620,6 +621,16 @@ def main():
             trainer.log_metrics("test", metrics)
             trainer.save_metrics("test", metrics)
             run.log(metrics)
+
+    logs_file = training_args.output_dir+"/trainer_state.json"
+
+    # Opening JSON file
+    with open(logs_file) as f:
+        data = json.load(f)
+        for log_record in data['log_history']:
+            run.log(log_record)
+
+
     return results
 
 
