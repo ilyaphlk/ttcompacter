@@ -1280,13 +1280,13 @@ class T5PreTrainedModel(PreTrainedModel):
             tt_cores = [np.expand_dims(tt_core, 2) for tt_core in tt_cores]
 
             layer_path = k[:-7]  # cutoff ".weight"
-            print("old weight:", next(getattr(layer_path, 'parameters')()))
+            print("old weight:", next(getattr(model, layer_path+'.parameters')()))
 
             setattr(model, layer_path, TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False))
 
             # layer_path = k
             # setattr(model, layer_path, TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False).weight)
-            print("new weight:", next(getattr(layer_path, 'parameters')()))
+            print("new weight:", next(getattr(model, layer_path+'.parameters')()))
 
 
         # make sure token embedding weights are still tied if needed
