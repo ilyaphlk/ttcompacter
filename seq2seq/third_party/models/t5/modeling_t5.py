@@ -1275,8 +1275,8 @@ class T5PreTrainedModel(PreTrainedModel):
         for k in state_dict.keys():
             print(k)
 
-        print("missing_keys:", missing_keys)
-        print("unexpected_keys:", unexpected_keys)
+        print("missing_keys:", len(missing_keys))
+        print("unexpected_keys:", len(unexpected_keys))
 
         for k, v in unused_weights.items():
             tt_weight = ttpy.tensor(v.data.numpy().reshape(8,8,12), 1e-4, rmax=2) # todo: make shape, rank consistent with model init
@@ -1287,8 +1287,11 @@ class T5PreTrainedModel(PreTrainedModel):
                 nk = k[:-7] + '.' + p_name
                 state_dict[nk] = p
 
-        model.load_state_dict(state_dict)
-
+        model, missing_keys, unexpected_keys, error_msgs = cls._load_state_dict_into_model(
+            model, state_dict, pretrained_model_name_or_path, _fast_init=_fast_init
+        )
+        print("missing_keys:", len(missing_keys))
+        print("unexpected_keys:", len(unexpected_keys))
 
         #for k, v in unused_weights.items():
             #print(k)
