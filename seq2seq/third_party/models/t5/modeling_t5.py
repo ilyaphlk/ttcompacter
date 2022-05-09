@@ -1279,10 +1279,14 @@ class T5PreTrainedModel(PreTrainedModel):
         print("unexpected_keys:", unexpected_keys)
 
         for k, v in unused_weights.items():
-            tt_weight = ttpy.tensor(v.data.numpy().reshape(8,8,12), 1e-4, rmax=2)
+            tt_weight = ttpy.tensor(v.data.numpy().reshape(8,8,12), 1e-4, rmax=2) # todo: make shape, rank consistent with model init
             tt_cores = ttpy.tensor.to_list(tt_weight)
             tt_cores = [np.expand_dims(tt_core, 2) for tt_core in tt_cores]
-            state_dict[nk] = TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False)
+            ln = TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False)
+            for p_name, p in ln.named_parameters():
+                nk = k[:-7] + '.' + p_name
+                state_dict[nk] = p
+
         model.load_state_dict(state_dict)
 
 
