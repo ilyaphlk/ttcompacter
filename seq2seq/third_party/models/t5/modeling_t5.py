@@ -120,6 +120,7 @@ import numpy as np
 import tt as ttpy
 from t3nsor.layers import TTLayerNorm
 from t3nsor.tensor_train import TensorTrain
+from t3nsor.utils import auto_shape
 
 logger = logging.get_logger(__name__)
 
