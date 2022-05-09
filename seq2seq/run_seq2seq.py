@@ -624,11 +624,11 @@ def main():
 
     logs_file = training_args.output_dir+"/trainer_state.json"
 
-    # Opening JSON file
-    with open(logs_file) as f:
-        data = json.load(f)
-        for log_record in data['log_history']:
-            run.log(log_record)
+    # # Opening JSON file
+    # with open(logs_file) as f:
+    #     data = json.load(f)
+    #     for log_record in data['log_history']:
+    #         run.log(log_record)
 
 
     return results
