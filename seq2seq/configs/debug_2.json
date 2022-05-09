@@ -51,10 +51,11 @@
 "reverse_out_shape": false,
 "factorize_smaller_dim": true,
 "tensor_train_single": false,
-"use_ScaleNorm": false,
+"use_LayerNorm_mean": false,
+"use_ScaleNorm": true,
 "ScaleNorm_scale": 1.0,
-"use_TTLayerNorm": true,
-"TTLayerNorm_preinit": false,
+"use_TTLayerNorm": false,
+"TTLayerNorm_preinit": true,
 "use_bias": true,
 "use_TTBias": true
 }
