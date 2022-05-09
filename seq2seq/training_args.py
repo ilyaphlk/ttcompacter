@@ -192,6 +192,11 @@ class AdapterTrainingArguments:
         metadata={"help": "if set, approximates pretrained LayerNorm weights instead of const init"}
     )
 
+    use_LayerNorm_mean: bool = field(
+        default=False,
+        metadata={"help": "if set, approximates with mean of pretrained LayerNorm weights"}
+    )
+
     use_bias: bool = field(
         default=True,
         metadata={"help": "if set, uses bias in adapter layers"}

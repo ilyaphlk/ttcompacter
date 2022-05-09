@@ -71,6 +71,7 @@ class AdapterConfig(object):
     use_TTLayerNorm: bool = False
     TTLayerNorm_rk: int = 2
     TTLayerNorm_preinit: bool = False
+    use_LayerNorm_mean: bool = False
     use_bias: bool = True
     use_TTBias: bool = False
     TTBias_rk: int = 2
