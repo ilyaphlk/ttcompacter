@@ -1286,14 +1286,14 @@ class T5PreTrainedModel(PreTrainedModel):
             #encoder.block.2.layer.0.layer_norm
 
             print("encoder:\n", getattr(model, 'encoder'))
-            print("block layer:\n", getattr(model, 'encoder.block.2.layer'))
+            #print("block layer:\n", getattr(model, 'encoder.block.2.layer'))
             print("old weight:", getattr(model, layer_path+'.weight.tt_cores')[0])
 
             setattr(model, layer_path, TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False))
 
             # layer_path = k
             # setattr(model, layer_path, TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False).weight)
-            #print("new weight:", next(getattr(model, layer_path+'.parameters')()))
+            print("new weight:", next(getattr(model, layer_path+'.parameters')()))
 
 
         # make sure token embedding weights are still tied if needed
