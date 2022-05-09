@@ -30,6 +30,7 @@
 "unfreeze_layer_norms": true,
 "overwrite_output_dir": true,
 
+"report_to":"tensorboard",
 "project_name": "tt_debug",
 "experiment_name": "debug_1",
 "task_name": "mrpc",
