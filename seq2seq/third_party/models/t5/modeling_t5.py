@@ -1274,13 +1274,17 @@ class T5PreTrainedModel(PreTrainedModel):
         for k, v in unused_weights.items():
             #print(k)
             #print(type(v))
-            layer_path = k#[:-7]  # cutoff ".weight"
+            
             tt_weight = ttpy.tensor(v.data.numpy().reshape(8,8,12), 1e-4, rmax=2)
             tt_cores = ttpy.tensor.to_list(tt_weight)
             tt_cores = [np.expand_dims(tt_core, 2) for tt_core in tt_cores]
-            print([elem.shape for elem in tt_cores])
-            
-            setattr(model, layer_path, TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False).weight)
+
+            layer_path = k[:-7]  # cutoff ".weight"
+            setattr(model, layer_path, TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False))
+
+            # layer_path = k
+            # setattr(model, layer_path, TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False).weight)
+            print("new weight:", getattr(model, layer_path))
 
 
         # make sure token embedding weights are still tied if needed

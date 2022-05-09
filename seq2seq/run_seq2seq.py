@@ -304,7 +304,7 @@ def main():
     logger.info(f"adapter shape: {adapter_args.tt_shape}")
     logger.info("Training/evaluation parameters %s", training_args)
 
-    os.environ["WANDB_DISABLED"] = "true"
+    #os.environ["WANDB_DISABLED"] = "true"
 
 
     # Set seed before initializing model.
