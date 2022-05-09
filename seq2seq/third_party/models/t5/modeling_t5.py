@@ -2043,7 +2043,7 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
             )
 
             sample_miss_key = 'decoder.block.1.layer.2.layer_norm.parameters.2'
-            print(state_dict[sample_miss_key])
+            print(model.state_dict()[sample_miss_key])
             
             if adapter_config.use_TTLayerNorm and adapter_config.TTLayerNorm_preinit:
                 #try setting weights here
