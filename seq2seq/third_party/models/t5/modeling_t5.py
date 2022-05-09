@@ -1854,7 +1854,7 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
         from_pipeline = kwargs.pop("_from_pipeline", None)
         from_auto_class = kwargs.pop("_from_auto", False)
         _fast_init = kwargs.pop("_fast_init", True)
-        adapter_config = kwargs.pop("adapter_config", None)
+        adapter_config = kwargs.pop("adapter_config_", None)
 
         user_agent = {"file_type": "model", "framework": "pytorch", "from_auto_class": from_auto_class}
         if from_pipeline is not None:
