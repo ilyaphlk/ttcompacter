@@ -2052,8 +2052,8 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                 model, state_dict, pretrained_model_name_or_path, _fast_init=_fast_init
             )
 
-            sample_miss_key = 'decoder.block.1.layer.2.layer_norm.parameters.2'
-            print("before init\n", model.state_dict()[sample_miss_key])
+            #sample_miss_key = 'decoder.block.1.layer.2.layer_norm.weight'
+            #print("before init\n", model.state_dict()[sample_miss_key])
 
             if adapter_config.use_ScaleNorm and adapter_config.use_LayerNorm_mean:
                 for k in state_dict.keys():
@@ -2096,7 +2096,7 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                     torch.save(model.state_dict(), f'sd_TTLN_rk{adapter_config.TTLayerNorm_rk}.pt')
                     print("SAVED TTLN_CHECKPOINT")
 
-            print("after init\n", model.state_dict()[sample_miss_key])
+            #print("after init\n", model.state_dict()[sample_miss_key])
 
         # make sure token embedding weights are still tied if needed
         model.tie_weights()

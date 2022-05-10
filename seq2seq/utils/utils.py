@@ -115,7 +115,7 @@ def freeze_model_params(model, adapter_args):
                 print("found layernorm", len(name.split(".")), name)
                 if len(name.split(".")) < 7: # this will not consider layer norms inside adapters then.
                     for param_name, param in sub_module.named_parameters():
-                        #print(f"set {param_name} grad = true")
+                        print(f"set {param_name} grad = true")
                         param.requires_grad = True
 
     if adapter_args.prefix_tuning:           
