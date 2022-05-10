@@ -52,7 +52,7 @@
 "factorize_smaller_dim": true,
 "tensor_train_single": false,
 "use_LayerNorm_mean": false,
-"use_ScaleNorm": true,
+"use_ScaleNorm": false,
 "ScaleNorm_scale": 1.0,
 "use_TTLayerNorm": true,
 "TTLayerNorm_preinit": true,

@@ -117,7 +117,7 @@ from seq2seq.hypercomplex.inits import  glorot_uniform, glorot_normal
 from typing import Dict, Any
 
 import numpy as np
-#import tt as ttpy
+import tt as ttpy
 from t3nsor.layers import TTLayerNorm
 from t3nsor.tensor_train import TensorTrain
 from t3nsor.utils import auto_shape
@@ -1858,7 +1858,10 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
         from_pipeline = kwargs.pop("_from_pipeline", None)
         from_auto_class = kwargs.pop("_from_auto", False)
         _fast_init = kwargs.pop("_fast_init", True)
-        adapter_config = kwargs.pop("adapter_config_", None)
+        adapter_config = kwargs.get("adapter_config", None) # TODO get instead of pop
+        LN_state_dict_path = kwargs.pop("state_dict_path", None)
+        save_state_dict = kwargs.pop("save_state_dict", False)
+
 
         user_agent = {"file_type": "model", "framework": "pytorch", "from_auto_class": from_auto_class}
         if from_pipeline is not None:
@@ -2031,6 +2034,10 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                 raise
         else:
             print("in 13")
+            if LN_state_dict_path is not None:
+                state_dict = torch.load(LN_state_dict_path, map_location="cpu")
+                print("LOADED TTLN_CHECKPOINT")
+
             if state_dict is None:
                 try:
                     state_dict = torch.load(resolved_archive_file, map_location="cpu")
@@ -2045,8 +2052,8 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                 model, state_dict, pretrained_model_name_or_path, _fast_init=_fast_init
             )
 
-            #sample_miss_key = 'decoder.block.1.layer.2.layer_norm.parameters.2'
-            #print("before init\n", model.state_dict()[sample_miss_key])
+            sample_miss_key = 'decoder.block.1.layer.2.layer_norm.parameters.2'
+            print("before init\n", model.state_dict()[sample_miss_key])
 
             if adapter_config.use_ScaleNorm and adapter_config.use_LayerNorm_mean:
                 for k in state_dict.keys():
@@ -2060,7 +2067,7 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                 )
 
             
-            if adapter_config.use_TTLayerNorm and adapter_config.TTLayerNorm_preinit:
+            if adapter_config.use_TTLayerNorm and adapter_config.TTLayerNorm_preinit and LN_state_dict_path is None:
                 #try setting weights here
                 unused_weights = {k:state_dict[k] for k in unexpected_keys}
                 print("missing_keys:", len(missing_keys))
@@ -2084,7 +2091,12 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                 model, missing_keys, unexpected_keys, error_msgs = cls._load_state_dict_into_model(
                     model, state_dict, pretrained_model_name_or_path, _fast_init=_fast_init
                 )
-            #print("after init\n", model.state_dict()[sample_miss_key])
+
+                if save_state_dict:
+                    torch.save(model.state_dict(), f'sd_TTLN_rk{adapter_config.TTLayerNorm_rk}.pt')
+                    print("SAVED TTLN_CHECKPOINT")
+
+            print("after init\n", model.state_dict()[sample_miss_key])
 
         # make sure token embedding weights are still tied if needed
         model.tie_weights()
