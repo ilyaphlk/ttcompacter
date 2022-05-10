@@ -325,6 +325,7 @@ def main():
     run.config.use_TTBias = adapter_args.use_TTBias
     run.config.TTBias_rk = adapter_args.TTBias_rk
     run.config.use_LayerNorm_mean = adapter_args.use_LayerNorm_mean
+    run.config.ttpy_eps = adapter_args.ttpy_eps
 
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",

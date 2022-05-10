@@ -117,7 +117,7 @@ from seq2seq.hypercomplex.inits import  glorot_uniform, glorot_normal
 from typing import Dict, Any
 
 import numpy as np
-#import tt as ttpy
+import tt as ttpy
 from t3nsor.layers import TTLayerNorm
 from t3nsor.tensor_train import TensorTrain
 from t3nsor.utils import auto_shape
@@ -2080,7 +2080,9 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                     if adapter_config.use_LayerNorm_mean:
                         ln = TTLayerNorm(768, 1, tt_rank=adapter_config.TTLayerNorm_rk, scale_const=v.mean())
                     else:
-                        tt_weight = ttpy.tensor(v.data.numpy().reshape(*ln_shape), 1e-4, rmax=adapter_config.TTLayerNorm_rk) # todo: make shape, rank consistent with model init
+                        tt_weight = ttpy.tensor(v.data.numpy().reshape(*ln_shape),
+                                                eps=adapter_config.ttpy_eps,
+                                                rmax=adapter_config.TTLayerNorm_rk) # todo: make shape, rank consistent with model init
                         tt_cores = ttpy.tensor.to_list(tt_weight)
                         tt_cores = [np.expand_dims(tt_core, 2) for tt_core in tt_cores]
                         ln = TTLayerNorm(init=TensorTrain(tt_cores), auto_shapes=False)

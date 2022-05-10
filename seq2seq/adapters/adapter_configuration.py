@@ -75,6 +75,7 @@ class AdapterConfig(object):
     use_bias: bool = True
     use_TTBias: bool = False
     TTBias_rk: int = 2
+    ttpy_eps: float = 1e-4
 
     factorize_smaller_dim: bool = True
     freeze_cores = None  # either None, 'first' or 'last'

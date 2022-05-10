@@ -212,6 +212,11 @@ class AdapterTrainingArguments:
         metadata={"help": "rk to use when tensorising bias vectors"}
     )
 
+    ttpy_eps: float = field(
+        default=1e-4,
+        metadata={"help": "eps to use when tensorising LN vectors"}
+    )
+
     # additional fields
 
     freeze_cores: Optional[str] = field(
