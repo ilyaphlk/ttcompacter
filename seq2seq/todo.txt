@@ -1,3 +1,16 @@
+"unfreeze_layer_norms": true,
+"use_TTLayerNorm": true,
+"TTLayerNorm_preinit": true,
+"TTLayerNorm_rk": 5,
+"use_bias": true,
+"use_TTBias": false,
+
+
+
+
+
+
+
 ####################
 Замер экспрессивности модели
 ####################
@@ -65,6 +78,8 @@ import в modeling_t5.py
 - понять, какая должна быть инициализация, чтобы в начале вектор был единичным
 (ones(...) / tt_rank ** ((d-1)/d))
 
+
+разложение существующих весов в TT:
 
 
 
