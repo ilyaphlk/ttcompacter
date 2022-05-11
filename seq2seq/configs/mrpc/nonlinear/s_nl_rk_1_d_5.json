@@ -30,7 +30,7 @@
 "overwrite_output_dir": true,
 
 "project_name": "TTNonlinearity",
-"experiment_name": "s_nl_rk_1_d_6",
+"experiment_name": "s_nl_rk_1_d_5",
 "task_name": "mrpc",
 "eval_dataset_name": "mrpc", 
 "test_dataset_name": "mrpc",
