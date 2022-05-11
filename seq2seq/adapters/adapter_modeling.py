@@ -28,7 +28,7 @@ class TensorTrainSingle(nn.Module):
         if config.use_bias and config.use_TTBias:
             self.bias = TTBias(self.input_dim, 1, c=1e-3, tt_rank=config.TTBias_rk)
         elif config.use_bias:
-            self.bias = nn.Parameter(1e-3 * torch.ones(out_features))
+            self.bias = nn.Parameter(1e-3 * torch.ones(self.input_dim))
         else:
             self.register_parameter('bias', None)
 
