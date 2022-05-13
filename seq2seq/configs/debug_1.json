@@ -54,8 +54,10 @@
 "use_LayerNorm_mean": false,
 "use_ScaleNorm": false,
 "ScaleNorm_scale": 1.0,
-"use_TTLayerNorm": true,
-"TTLayerNorm_preinit": true,
-"use_bias": true,
-"use_TTBias": false
+"use_TTLayerNorm": false,
+"TTLayerNorm_preinit": false,
+"use_bias": false,
+"use_TTBias": false,
+"use_LoRA": true,
+"use_TTLoRA": false
 }
