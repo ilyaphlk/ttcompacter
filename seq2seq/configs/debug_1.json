@@ -31,7 +31,6 @@
 "overwrite_output_dir": true,
 
 "project_name": "tt_debug",
-"experiment_name": "debug_1",
 "task_name": "mrpc",
 "eval_dataset_name": "mrpc", 
 "test_dataset_name": "mrpc",
@@ -46,8 +45,6 @@
 "task_reduction_factor": 32,
 "task_expansion_factor": 0,
 "tensor_train_adapters": true,
-"tt_rank": 1,
-"tt_d": 3,
 "reverse_out_shape": false,
 "factorize_smaller_dim": true,
 "tensor_train_single": false,
@@ -58,6 +55,11 @@
 "TTLayerNorm_preinit": false,
 "use_bias": false,
 "use_TTBias": false,
+
+
+"experiment_name": "ttlora_d3_r1",
+"tt_rank": 1,
+"tt_d": 3,
 "use_LoRA": false,
 "use_TTLoRA": true
 }
