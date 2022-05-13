@@ -58,6 +58,6 @@
 "TTLayerNorm_preinit": false,
 "use_bias": false,
 "use_TTBias": false,
-"use_LoRA": true,
-"use_TTLoRA": false
+"use_LoRA": false,
+"use_TTLoRA": true
 }
