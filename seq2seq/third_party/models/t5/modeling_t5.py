@@ -411,6 +411,7 @@ class TTLoRALinear(nn.Linear, LoRALayer):
         merge_weights: bool = True,
         **kwargs
     ):
+        tt_d = kwargs.pop('tt_d', 3)
         nn.Linear.__init__(self, in_features, out_features, **kwargs)
         LoRALayer.__init__(self, r=r, lora_alpha=lora_alpha, lora_dropout=lora_dropout,
                            merge_weights=merge_weights)
@@ -419,7 +420,7 @@ class TTLoRALinear(nn.Linear, LoRALayer):
         if r > 0:
             self.lora_part = TTLinear(
                 in_features, out_features,
-                d=kwargs['tt_d'],
+                d=tt_d,
                 tt_rank=r,
                 bias=False
             )
