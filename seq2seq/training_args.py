@@ -212,6 +212,17 @@ class AdapterTrainingArguments:
         metadata={"help": "rk to use when tensorising bias vectors"}
     )
 
+    use_LoRA: bool = field(
+        default=False,
+        metadata={"help": "if set, use LoRA-style adapters"}
+    )
+
+    use_TTLoRA: bool = field(
+        default=False,
+        metadata={"help": "if set, use LoRA-style TT-adapters"}
+    )
+
+
     # additional fields
 
     freeze_cores: Optional[str] = field(

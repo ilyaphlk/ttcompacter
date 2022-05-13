@@ -76,6 +76,9 @@ class AdapterConfig(object):
     use_TTBias: bool = False
     TTBias_rk: int = 2
 
+    use_LoRA: bool = False
+    use_TTLoRA: bool = False
+
     factorize_smaller_dim: bool = True
     freeze_cores = None  # either None, 'first' or 'last'
 

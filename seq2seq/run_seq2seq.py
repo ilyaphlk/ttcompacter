@@ -303,6 +303,7 @@ def main():
     run.config.warmup_steps = training_args.warmup_steps
     run.config.batch_size = training_args.per_device_train_batch_size
     run.config.non_linearity = adapter_args.non_linearity
+
     run.config.task_reduction_factor = adapter_args.task_reduction_factor
     run.config.task_expansion_factor = adapter_args.task_expansion_factor
     run.config.tensor_train_adapters = adapter_args.tensor_train_adapters
@@ -325,6 +326,10 @@ def main():
     run.config.use_TTBias = adapter_args.use_TTBias
     run.config.TTBias_rk = adapter_args.TTBias_rk
     run.config.use_LayerNorm_mean = adapter_args.use_LayerNorm_mean
+
+    run.config.use_LoRA = adapter_args.use_LoRA
+    run.config.use_TTLoRA = adapter_args.use_TTLoRA
+
 
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",

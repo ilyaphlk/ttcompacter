@@ -7,7 +7,7 @@ import json
 
 from seq2seq.adapters import (AutoAdapterConfig, AdapterController, Adapter, HyperComplexAdapter)
 from projections.intrinsic import intrinsic_dimension, intrinsic_dimension_said
-from seq2seq.third_party.models.t5 import T5LayerNorm
+from seq2seq.third_party.models.t5 import T5LayerNorm, TTLoRALinear, LoRALinear
 from t3nsor.layers import TTLayerNorm
 
 
@@ -75,10 +75,16 @@ def freeze_model_params(model, adapter_args):
     if adapter_args.train_task_adapters:
         freeze_params(model)
         for name, sub_module in model.named_modules():
-            if isinstance(sub_module, (AdapterController, Adapter)):
+            if isinstance(sub_module, (AdapterController, Adapter, TTLoRALinear, LoRALinear)):
                 if isinstance(sub_module, (AdapterController, HyperComplexAdapter)) and adapter_args.hypercomplex_adapters:
                     for param_name, param in sub_module.named_parameters():
                         if any(x in param_name for x in ["phm_rule", "phm_rule_left", "phm_rule_right"]) and not adapter_args.learn_phm:
+                            param.requires_grad = False
+                        else:
+                            param.requires_grad = True
+                if isinstance(sub_module, (TTLoRALinear, LoRALinear)) and (adapter_args.use_LoRA or adapter_args.use_TTLoRA):
+                    for param_name, param in sub_module.named_parameters():
+                        if 'lora' not in param_name:
                             param.requires_grad = False
                         else:
                             param.requires_grad = True

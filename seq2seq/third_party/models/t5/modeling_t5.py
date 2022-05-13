@@ -118,7 +118,7 @@ from typing import Dict, Any
 
 import numpy as np
 #import tt as ttpy
-from t3nsor.layers import TTLayerNorm
+from t3nsor.layers import TTLayerNorm, TTLinear
 from t3nsor.tensor_train import TensorTrain
 from t3nsor.utils import auto_shape
 
@@ -302,6 +302,173 @@ DEPARALLELIZE_DOCSTRING = r"""
         model.deparallelize() # Put the model back on cpu and cleans memory by calling torch.cuda.empty_cache()
 """
 
+# https://github.com/microsoft/LoRA/blob/main
+
+import torch.nn.functional as F
+
+import math
+from typing import Optional, List
+
+class LoRALayer():
+    def __init__(
+        self, 
+        r: int, 
+        lora_alpha: int, 
+        lora_dropout: float,
+        merge_weights: bool,
+    ):
+        self.r = r
+        self.lora_alpha = lora_alpha
+        # Optional dropout
+        if lora_dropout > 0.:
+            self.lora_dropout = nn.Dropout(p=lora_dropout)
+        else:
+            self.lora_dropout = lambda x: x
+        # Mark the weight as unmerged
+        self.merged = False
+        self.merge_weights = merge_weights
+
+
+class LoRALinear(nn.Linear, LoRALayer):
+    # LoRA implemented in a dense layer
+    def __init__(
+        self, 
+        in_features: int, 
+        out_features: int, 
+        r: int = 0, 
+        lora_alpha: int = 1, 
+        lora_dropout: float = 0.,
+        fan_in_fan_out: bool = False, # Set this to True if the layer to replace stores weight like (fan_in, fan_out)
+        merge_weights: bool = True,
+        **kwargs
+    ):
+        nn.Linear.__init__(self, in_features, out_features, **kwargs)
+        LoRALayer.__init__(self, r=r, lora_alpha=lora_alpha, lora_dropout=lora_dropout,
+                           merge_weights=merge_weights)
+
+        self.fan_in_fan_out = fan_in_fan_out
+        # Actual trainable parameters
+        if r > 0:
+            self.lora_A = nn.Parameter(self.weight.new_zeros((r, in_features)))
+            self.lora_B = nn.Parameter(self.weight.new_zeros((out_features, r)))
+            self.scaling = self.lora_alpha / self.r
+            # Freezing the pre-trained weight matrix
+            self.weight.requires_grad = False
+        self.reset_parameters()
+        if fan_in_fan_out:
+            self.weight.data = self.weight.data.T
+
+    def reset_parameters(self):
+        nn.Linear.reset_parameters(self)
+        if hasattr(self, 'lora_A'):
+            # initialize A the same way as the default for nn.Linear and B to zero
+            nn.init.kaiming_uniform_(self.lora_A, a=math.sqrt(5))
+            nn.init.zeros_(self.lora_B)
+
+    def train(self, mode: bool = True):
+        def T(w):
+            return w.T if self.fan_in_fan_out else w
+        nn.Linear.train(self, mode)
+        if self.merge_weights and self.merged:
+            # Make sure that the weights are not merged
+            if self.r > 0:
+                self.weight.data -= T(self.lora_B @ self.lora_A) * self.scaling
+            self.merged = False
+    
+    def eval(self):
+        def T(w):
+            return w.T if self.fan_in_fan_out else w
+        nn.Linear.eval(self)
+        if self.merge_weights and not self.merged:
+            # Merge the weights and mark it
+            if self.r > 0:
+                self.weight.data += T(self.lora_B @ self.lora_A) * self.scaling
+            self.merged = True
+
+    def forward(self, x: torch.Tensor):
+        def T(w):
+            return w.T if self.fan_in_fan_out else w
+        if self.r > 0 and not self.merged:
+            result = F.linear(x, T(self.weight), bias=self.bias)
+            if self.r > 0:
+                result += (self.lora_dropout(x) @ self.lora_A.T @ self.lora_B.T) * self.scaling
+            return result
+        else:
+            return F.linear(x, T(self.weight), bias=self.bias)
+
+
+
+class TTLoRALinear(nn.Linear, LoRALayer):
+    # LoRA implemented in a dense layer
+    def __init__(
+        self, 
+        in_features: int, 
+        out_features: int, 
+        r: int = 0, 
+        lora_alpha: int = 1, 
+        lora_dropout: float = 0.,
+        #fan_in_fan_out: bool = False, # Set this to True if the layer to replace stores weight like (fan_in, fan_out)
+        merge_weights: bool = True,
+        **kwargs
+    ):
+        nn.Linear.__init__(self, in_features, out_features, **kwargs)
+        LoRALayer.__init__(self, r=r, lora_alpha=lora_alpha, lora_dropout=lora_dropout,
+                           merge_weights=merge_weights)
+
+        # Actual trainable parameters
+        if r > 0:
+            self.lora_part = TTLinear(
+                in_features, out_features,
+                d=kwargs['tt_d'],
+                tt_rank=r,
+                bias=False
+            )
+            self.scaling = self.lora_alpha / self.r
+            # Freezing the pre-trained weight matrix
+            self.weight.requires_grad = False
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        nn.Linear.reset_parameters(self)
+        if hasattr(self, 'lora_part'):
+            # initialize A the same way as the default for nn.Linear and B to zero
+            self.lora_part.reset_parameters()
+
+    def train(self, mode: bool = True):
+        nn.Linear.train(self, mode)
+        if self.merge_weights and self.merged:
+            # Make sure that the weights are not merged
+            if self.r > 0:
+                unpacked = self.lora_part.weight.tt_cores[0]
+                for tt_core in self.lora_part.weight.tt_cores[1:]:
+                    unpacked = torch.tensordot(unpacked, tt_core, dims=[[-1],[0]])
+
+                self.weight.data -= unpacked.reshape(*self.weight.data.shape) * self.scaling
+            self.merged = False
+    
+    def eval(self):
+        nn.Linear.eval(self)
+        if self.merge_weights and not self.merged:
+            # Merge the weights and mark it
+            if self.r > 0:
+                unpacked = self.lora_part.weight.tt_cores[0]
+                for tt_core in self.lora_part.weight.tt_cores[1:]:
+                    unpacked = torch.tensordot(unpacked, tt_core, dims=[[-1],[0]])
+
+                self.weight.data += unpacked.reshape(*self.weight.data.shape) * self.scaling
+            self.merged = True
+
+    def forward(self, x: torch.Tensor):
+        if self.r > 0 and not self.merged:
+            result = F.linear(x, self.weight, bias=self.bias)
+            if self.r > 0:
+                result += self.lora_part(self.lora_dropout(x)) * self.scaling
+            return result
+        else:
+            return F.linear(x, self.weight, bias=self.bias)
+
+
+
 
 class T5LayerNorm(nn.Module):
     def __init__(self, hidden_size, eps=1e-6, adapter_config=None, scale_const=None):
@@ -346,10 +513,24 @@ class T5LayerNorm(nn.Module):
 class T5DenseReluDense(nn.Module):
     def __init__(self, config, adapter_config=None):
         super().__init__()
-        self.bitfit = adapter_config.bitfit if adapter_config is not None else False 
-        self.wi = nn.Linear(config.d_model, config.d_ff, bias=False if not self.bitfit else True)
-        self.wo = nn.Linear(config.d_ff, config.d_model, bias=False if not self.bitfit else True)
+        self.bitfit = adapter_config.bitfit if adapter_config is not None else False
+        self.use_LoRA = adapter_config.use_LoRA if adapter_config is not None else False
+        self.use_TTLoRA = adapter_config.use_TTLoRA if adapter_config is not None else False
+
+        if self.use_TTLoRA:
+            self.wi = TTLoRALinear(config.d_model, config.d_ff,
+                bias=False, r=adapter_config.tt_rank, tt_d=adapter_config.tt_d)
+            self.wo = TTLoRALinear(config.d_ff, config.d_model,
+                bias=False, r=adapter_config.tt_rank, tt_d=adapter_config.tt_d)
+        elif self.use_LoRA:
+            self.wi = LoRALinear(config.d_model, config.d_ff, bias=False, r=adapter_config.tt_rank)
+            self.wo = LoRALinear(config.d_ff, config.d_model, bias=False, r=adapter_config.tt_rank)
+        else:
+            self.wi = nn.Linear(config.d_model, config.d_ff, bias=False if not self.bitfit else True)
+            self.wo = nn.Linear(config.d_ff, config.d_model, bias=False if not self.bitfit else True)
+
         self.dropout = nn.Dropout(config.dropout_rate)
+
 
     def forward(self, hidden_states):
         hidden_states = self.wi(hidden_states)
@@ -390,7 +571,8 @@ class T5LayerFF(nn.Module):
                 f"{self.config.feed_forward_proj} is not supported. Choose between `relu` and `gated-gelu`"
             )
         self.train_task_adapters = config.train_task_adapters and adapter_config.add_adapter_in_feed_forward
-        if self.train_task_adapters:
+        self.lora_style = adapter_config.use_LoRA or adapter_config.use_TTLoRA
+        if self.train_task_adapters and not self.lora_style:
             adapter_config.reduction_factor = adapter_config.task_reduction_factor
             adapter_config.expansion_factor = adapter_config.task_expansion_factor
             self.adapter_controller = AdapterController(adapter_config)
@@ -404,7 +586,7 @@ class T5LayerFF(nn.Module):
     def forward(self, hidden_states, task_block_adapters=None, task=None):
         forwarded_states = self.layer_norm(hidden_states)
         forwarded_states = self.DenseReluDense(forwarded_states)
-        if self.train_task_adapters:
+        if self.train_task_adapters and not self.lora_style:
             forwarded_states = self.adapter_controller(forwarded_states, task)
         hidden_states = hidden_states + self.dropout(forwarded_states)
         return hidden_states
@@ -423,11 +605,25 @@ class T5Attention(nn.Module):
         self.n_heads = config.num_heads
         self.dropout = config.dropout_rate
         self.inner_dim = self.n_heads * self.key_value_proj_dim
+        self.use_LoRA = adapter_config.use_LoRA if adapter_config is not None else False
+        self.use_TTLoRA = adapter_config.use_TTLoRA if adapter_config is not None else False
 
         # Mesh TensorFlow initialization to avoid scaling before softmax
-        self.q = nn.Linear(self.d_model, self.inner_dim, bias=False if not self.bitfit else True)
+
+
+        if self.use_TTLoRA:
+            self.q = TTLoRALinear(config.d_model, self.inner_dim,
+                bias=False, r=adapter_config.tt_rank, tt_d=adapter_config.tt_d)
+            self.v = TTLoRALinear(config.d_model, self.inner_dim,
+                bias=False, r=adapter_config.tt_rank, tt_d=adapter_config.tt_d)
+        elif self.use_LoRA:
+            self.q = LoRALinear(config.d_model, self.inner_dim, bias=False, r=adapter_config.tt_rank)
+            self.v = LoRALinear(config.d_model, self.inner_dim, bias=False, r=adapter_config.tt_rank)
+        else:
+            self.q = nn.Linear(self.d_model, self.inner_dim, bias=False if not self.bitfit else True)
+            self.v = nn.Linear(self.d_model, self.inner_dim, bias=False if not self.bitfit else True)
+        
         self.k = nn.Linear(self.d_model, self.inner_dim, bias=False if not self.bitfit else True)
-        self.v = nn.Linear(self.d_model, self.inner_dim, bias=False if not self.bitfit else True)
         self.o = nn.Linear(self.inner_dim, self.d_model, bias=False if not self.bitfit else True)
 
         if self.has_relative_attention_bias:
@@ -640,7 +836,8 @@ class T5LayerSelfAttention(nn.Module):
         else:
             self.layer_norm = T5LayerNorm(config.d_model, eps=config.layer_norm_epsilon, adapter_config=adapter_config)
         self.train_task_adapters = config.train_task_adapters and adapter_config.add_adapter_in_self_attention
-        if self.train_task_adapters:
+        self.lora_style = adapter_config.use_LoRA or adapter_config.use_TTLoRA
+        if self.train_task_adapters and not self.lora_style:
             adapter_config.reduction_factor = adapter_config.task_reduction_factor
             adapter_config.expansion_factor = adapter_config.task_expansion_factor
             self.adapter_controller = AdapterController(adapter_config)
@@ -670,7 +867,7 @@ class T5LayerSelfAttention(nn.Module):
             output_attentions=output_attentions,
         )
         y = attention_output[0]
-        if self.train_task_adapters:
+        if self.train_task_adapters and not self.lora_style:
            y = self.adapter_controller(y, task)
         hidden_states = hidden_states + self.dropout(y)
         outputs = (hidden_states,) + attention_output[1:]  # add attentions if we output them
