@@ -39,7 +39,7 @@
 "logging_steps":30,
 "learning_rate": 3e-4,
 "warmup_steps": 500,
-"per_device_train_batch_size": 35,
+"per_device_train_batch_size": 25,
 "per_device_eval_batch_size": 50,
 "max_source_length": 128,
 "non_linearity": "gelu_new",
