@@ -387,7 +387,7 @@ def main():
     )
 
     state_dict_path = None
-    if adapter_config.use_TTLayerNorm and adapter_config.TTLayerNorm_preinit:
+    if adapter_config.use_TTLayerNorm and adapter_config.TTLayerNorm_preinit and not adapter_config.use_LayerNorm_mean:
         checkpoint_candidate = f'sd_TTLN_rk{adapter_config.TTLayerNorm_rk}.pt'
         if os.path.exists(checkpoint_candidate):
             state_dict_path = checkpoint_candidate
