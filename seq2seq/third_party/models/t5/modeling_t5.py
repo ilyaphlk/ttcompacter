@@ -412,6 +412,7 @@ class TTLoRALinear(nn.Linear, LoRALayer):
         **kwargs
     ):
         tt_d = kwargs.pop('tt_d', 3)
+        init_mode = kwargs.pop('init_mode', None)
         nn.Linear.__init__(self, in_features, out_features, **kwargs)
         LoRALayer.__init__(self, r=r, lora_alpha=lora_alpha, lora_dropout=lora_dropout,
                            merge_weights=merge_weights)
@@ -422,7 +423,8 @@ class TTLoRALinear(nn.Linear, LoRALayer):
                 in_features, out_features,
                 d=tt_d,
                 tt_rank=r,
-                bias=False
+                bias=False,
+                init_mode=init_mode
             )
             self.scaling = self.lora_alpha / self.r
             # Freezing the pre-trained weight matrix
@@ -520,9 +522,9 @@ class T5DenseReluDense(nn.Module):
 
         if self.use_TTLoRA:
             self.wi = TTLoRALinear(config.d_model, config.d_ff,
-                bias=False, r=adapter_config.tt_rank, tt_d=adapter_config.tt_d)
+                bias=False, r=adapter_config.tt_rank, tt_d=adapter_config.tt_d, init_mode=adapter_config.TTLoRA_init)
             self.wo = TTLoRALinear(config.d_ff, config.d_model,
-                bias=False, r=adapter_config.tt_rank, tt_d=adapter_config.tt_d)
+                bias=False, r=adapter_config.tt_rank, tt_d=adapter_config.tt_d, init_mode=adapter_config.TTLoRA_init)
         elif self.use_LoRA:
             self.wi = LoRALinear(config.d_model, config.d_ff, bias=False, r=adapter_config.tt_rank)
             self.wo = LoRALinear(config.d_ff, config.d_model, bias=False, r=adapter_config.tt_rank)
@@ -614,9 +616,9 @@ class T5Attention(nn.Module):
 
         if self.use_TTLoRA:
             self.q = TTLoRALinear(config.d_model, self.inner_dim,
-                bias=False, r=adapter_config.tt_rank, tt_d=adapter_config.tt_d)
+                bias=False, r=adapter_config.tt_rank, tt_d=adapter_config.tt_d, init_mode=adapter_config.TTLoRA_init)
             self.v = TTLoRALinear(config.d_model, self.inner_dim,
-                bias=False, r=adapter_config.tt_rank, tt_d=adapter_config.tt_d)
+                bias=False, r=adapter_config.tt_rank, tt_d=adapter_config.tt_d, init_mode=adapter_config.TTLoRA_init)
         elif self.use_LoRA:
             self.q = LoRALinear(config.d_model, self.inner_dim, bias=False, r=adapter_config.tt_rank)
             self.v = LoRALinear(config.d_model, self.inner_dim, bias=False, r=adapter_config.tt_rank)
