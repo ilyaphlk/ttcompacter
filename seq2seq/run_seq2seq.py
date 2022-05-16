@@ -329,6 +329,7 @@ def main():
 
     run.config.use_LoRA = adapter_args.use_LoRA
     run.config.use_TTLoRA = adapter_args.use_TTLoRA
+    run.config.TTLoRA_init = adapter_args.TTLoRA_init
 
 
     logging.basicConfig(

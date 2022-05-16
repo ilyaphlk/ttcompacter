@@ -78,6 +78,7 @@ class AdapterConfig(object):
 
     use_LoRA: bool = False
     use_TTLoRA: bool = False
+    TTLoRA_init: str = None
 
     factorize_smaller_dim: bool = True
     freeze_cores = None  # either None, 'first' or 'last'
