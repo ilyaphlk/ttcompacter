@@ -9,7 +9,6 @@
 "load_best_model_at_end": true,
 "metric_for_best_model": "average_metrics",
 "greater_is_better": true,
-"evaluation_strategy": "epoch",
 "split_validation_test": true,
 "dataset_config_name": ["en"],
 "eval_dataset_config_name": ["en"],
@@ -31,11 +30,12 @@
 "overwrite_output_dir": true,
 
 "project_name": "tt_lora",
-"task_name": "mrpc",
-"eval_dataset_name": "mrpc", 
-"test_dataset_name": "mrpc",
-"num_train_epochs": 30,
-"logging_steps":10,
+"task_name": "sst2",
+"eval_dataset_name": "sst2", 
+"test_dataset_name": "sst2",
+"num_train_epochs": 3,
+"evaluation_strategy": "steps",
+"eval_steps": 20,
 "learning_rate": 3e-4,
 "warmup_steps": 500,
 "per_device_train_batch_size": 100,
@@ -57,8 +57,8 @@
 "use_TTBias": false,
 
 
-"experiment_name": "ttlora_r8_g",
-"tt_rank": 8,
+"experiment_name": "ttlora_r2_g",
+"tt_rank": 2,
 "tt_d": 3,
 "use_LoRA": false,
 "use_TTLoRA": true
