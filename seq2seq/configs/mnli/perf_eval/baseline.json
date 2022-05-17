@@ -28,6 +28,7 @@
 "eval_dataset_name": "mnli",
 "test_dataset_name": "mnli",
 "num_train_epochs": 1,
+"logging_steps": 100,
 "dataset_config_name": ["en"],
 "eval_dataset_config_name": ["en"],
 "test_dataset_config_name": ["en"],
