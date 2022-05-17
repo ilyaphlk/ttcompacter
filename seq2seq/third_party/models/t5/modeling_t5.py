@@ -574,7 +574,7 @@ class T5LayerFF(nn.Module):
                 f"{self.config.feed_forward_proj} is not supported. Choose between `relu` and `gated-gelu`"
             )
         self.train_task_adapters = config.train_task_adapters and adapter_config.add_adapter_in_feed_forward
-        self.lora_style = adapter_config.use_LoRA or adapter_config.use_TTLoRA
+        self.lora_style = False if adapter_config is None else (adapter_config.use_LoRA or adapter_config.use_TTLoRA)
         if self.train_task_adapters and not self.lora_style:
             adapter_config.reduction_factor = adapter_config.task_reduction_factor
             adapter_config.expansion_factor = adapter_config.task_expansion_factor
@@ -839,7 +839,7 @@ class T5LayerSelfAttention(nn.Module):
         else:
             self.layer_norm = T5LayerNorm(config.d_model, eps=config.layer_norm_epsilon, adapter_config=adapter_config)
         self.train_task_adapters = config.train_task_adapters and adapter_config.add_adapter_in_self_attention
-        self.lora_style = adapter_config.use_LoRA or adapter_config.use_TTLoRA
+        self.lora_style = False if adapter_config is None else (adapter_config.use_LoRA or adapter_config.use_TTLoRA)
         if self.train_task_adapters and not self.lora_style:
             adapter_config.reduction_factor = adapter_config.task_reduction_factor
             adapter_config.expansion_factor = adapter_config.task_expansion_factor
