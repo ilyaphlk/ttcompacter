@@ -2255,7 +2255,7 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
             #sample_miss_key = 'decoder.block.1.layer.2.layer_norm.weight'
             #print("before init\n", model.state_dict()[sample_miss_key])
 
-            if adapter_config.use_ScaleNorm and adapter_config.use_LayerNorm_mean:
+            if adapter_config is not None and adapter_config.use_ScaleNorm and adapter_config.use_LayerNorm_mean:
                 for k in state_dict.keys():
                     if "layer_norm" in k:
                         ln = T5LayerNorm(768, eps=1e-6, adapter_config=adapter_config, scale_const=state_dict[k].mean())
@@ -2267,7 +2267,7 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                 )
 
             
-            if adapter_config.use_TTLayerNorm and adapter_config.TTLayerNorm_preinit and LN_state_dict_path is None:
+            if adapter_config is not None and adapter_config.use_TTLayerNorm and adapter_config.TTLayerNorm_preinit and LN_state_dict_path is None:
                 #try setting weights here
                 unused_weights = {k:state_dict[k] for k in unexpected_keys}
                 print("missing_keys:", len(missing_keys))
