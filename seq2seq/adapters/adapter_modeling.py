@@ -112,7 +112,7 @@ class TensorTrainAdapter(nn.Module):
 
     def forward(self, x):
         if self.config.use_checkpointing:
-            print("gotta checkpoint")
+            #print("gotta checkpoint")
             z = torch.utils.checkpoint.checkpoint(self.downsample, x)
         else:
             z = self.downsample(x)
