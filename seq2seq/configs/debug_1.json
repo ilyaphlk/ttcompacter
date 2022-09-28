@@ -57,10 +57,10 @@
 "use_TTBias": false,
 
 
-"experiment_name": "ttlora_d3_r1_k",
+"experiment_name": "tt_d3_r1",
 "tt_rank": 1,
 "tt_d": 3,
 "use_LoRA": false,
-"use_TTLoRA": true,
+"use_TTLoRA": false,
 "TTLoRA_init": "kaiming_zero"
 }

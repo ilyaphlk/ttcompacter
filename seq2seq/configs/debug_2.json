@@ -56,12 +56,12 @@
 "use_bias": false,
 "use_TTBias": false,
 
-"naive":true,
+"use_checkpointing": true,
 
-"experiment_name": "ttlora_d3_r1_k_naive",
+"experiment_name": "tt_d3_r1_checkpointing",
 "tt_rank": 1,
 "tt_d": 3,
 "use_LoRA": false,
-"use_TTLoRA": true,
+"use_TTLoRA": false,
 "TTLoRA_init": "kaiming_zero"
 }
