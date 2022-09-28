@@ -91,23 +91,35 @@ class TensorTrainAdapter(nn.Module):
             naive=config.naive
         )
 
-
-    def forward(self, x):
+    def downsample(self, x):
         if self.config.use_bias and self.config.use_TTBias:
             z = self.bias_down(self.down_sampler(x))
         elif self.config.use_bias:
             z = self.down_sampler(x) + self.bias_down
         else:
             z = self.down_sampler(x)
-        
-        z = self.activation(z)
+        return z
 
+    def upsample(self, x):
         if self.config.use_bias and self.config.use_TTBias:
             z = self.bias_up(self.up_sampler(z))
         elif self.config.use_bias:
             z = self.up_sampler(z) + self.bias_up
         else:
             z = self.up_sampler(z)
+        return z
+
+
+    def forward(self, x):
+        if self.config.use_checkpointing:
+            z = torch.utils.checkpoint.checkpoint(self.downsample, x)
+        else:
+            z = self.downsample(x)
+        
+        z = self.activation(z)
+
+        z = self.upsample(z)
+        
         return z
 
 

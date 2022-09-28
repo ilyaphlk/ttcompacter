@@ -167,6 +167,11 @@ class AdapterTrainingArguments:
         metadata={"help": "If set, uses naive premultiplication of ttcores before multiplying with input. Overrides use_scripted_mul"}
     )
 
+    use_checkpointing: bool = field(
+        default=False,
+        metadata={"help": "If set, uses gradient checkpointing in adapter layers"}
+    )
+
     auto_shape_mode: str = field(
         default='ascending',
         metadata={"help": "shape factorization mode"}

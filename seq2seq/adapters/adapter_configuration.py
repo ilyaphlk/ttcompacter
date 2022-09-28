@@ -67,6 +67,8 @@ class AdapterConfig(object):
     auto_shape_mode: str = 'ascending'
     naive: bool = False
 
+    use_checkpointing: bool = False
+
     use_ScaleNorm: bool = False
     ScaleNorm_scale: float = 1.0
     use_TTLayerNorm: bool = False
