@@ -100,14 +100,14 @@ class TensorTrainAdapter(nn.Module):
             z = self.down_sampler(x)
         return z
 
-    def upsample(self, x):
+    def upsample(self, z):
         if self.config.use_bias and self.config.use_TTBias:
-            z = self.bias_up(self.up_sampler(z))
+            x = self.bias_up(self.up_sampler(z))
         elif self.config.use_bias:
-            z = self.up_sampler(z) + self.bias_up
+            x = self.up_sampler(z) + self.bias_up
         else:
-            z = self.up_sampler(z)
-        return z
+            x = self.up_sampler(z)
+        return x
 
 
     def forward(self, x):
@@ -118,9 +118,9 @@ class TensorTrainAdapter(nn.Module):
         
         z = self.activation(z)
 
-        z = self.upsample(z)
+        x = self.upsample(z)
         
-        return z
+        return x
 
 
 class LowRankAdapter(nn.Module):
