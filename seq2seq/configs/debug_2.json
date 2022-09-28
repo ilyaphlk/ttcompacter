@@ -18,8 +18,8 @@
 "adapter_config_name": "adapter",
 "train_task_adapters": true,
 
-"logging_dir": "outputs/debug_1/trainer_logs",
-"output_dir": "outputs/debug_1",
+"logging_dir": "outputs/debug_2/trainer_logs",
+"output_dir": "outputs/debug_2",
 "compute_time": true,
 "compute_memory": true,
 "print_num_parameters": true,
@@ -34,7 +34,7 @@
 "task_name": "mrpc",
 "eval_dataset_name": "mrpc", 
 "test_dataset_name": "mrpc",
-"num_train_epochs": 1,
+"num_train_epochs": 2,
 "logging_steps":30,
 "learning_rate": 3e-4,
 "warmup_steps": 500,
@@ -56,10 +56,12 @@
 "use_bias": false,
 "use_TTBias": false,
 
+"naive":true,
 
-"experiment_name": "lora_d3_r1",
+"experiment_name": "ttlora_d3_r1_k_naive",
 "tt_rank": 1,
 "tt_d": 3,
-"use_LoRA": true,
-"use_TTLoRA": false
+"use_LoRA": false,
+"use_TTLoRA": true,
+"TTLoRA_init": "kaiming_zero"
 }
