@@ -316,6 +316,7 @@ def main():
     run.config.use_scripted_mul = adapter_args.use_scripted_mul
     run.config.auto_shape_mode = adapter_args.auto_shape_mode
     run.config.tensor_train_single = adapter_args.tensor_train_single
+    run.config.naive = adapter_args.naive
     
     run.config.use_ScaleNorm = adapter_args.use_ScaleNorm
     run.config.ScaleNorm_scale = adapter_args.ScaleNorm_scale

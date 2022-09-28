@@ -65,6 +65,7 @@ class AdapterConfig(object):
     cores_nonlinearity: str = None
     use_scripted_mul: bool = False
     auto_shape_mode: str = 'ascending'
+    naive: bool = False
 
     use_ScaleNorm: bool = False
     ScaleNorm_scale: float = 1.0

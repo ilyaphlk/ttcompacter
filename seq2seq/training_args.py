@@ -162,6 +162,11 @@ class AdapterTrainingArguments:
         metadata={"help": "If set, uses torch.jit to multiply Tensor Train cores"}
     )
 
+    naive: bool = field(
+        default=False,
+        metadata={"help": "If set, uses naive premultiplication of ttcores before multiplying with input. Overrides use_scripted_mul"}
+    )
+
     auto_shape_mode: str = field(
         default='ascending',
         metadata={"help": "shape factorization mode"}
