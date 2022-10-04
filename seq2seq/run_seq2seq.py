@@ -318,6 +318,7 @@ def main():
     run.config.tensor_train_single = adapter_args.tensor_train_single
     run.config.naive = adapter_args.naive
     run.config.use_checkpointing = adapter_args.use_checkpointing
+    run.config.ttcore_checkpointing = adapter_args.ttcore_checkpointing
     
     run.config.use_ScaleNorm = adapter_args.use_ScaleNorm
     run.config.ScaleNorm_scale = adapter_args.ScaleNorm_scale

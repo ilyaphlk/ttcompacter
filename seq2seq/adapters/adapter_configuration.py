@@ -68,6 +68,7 @@ class AdapterConfig(object):
     naive: bool = False
 
     use_checkpointing: bool = False
+    ttcore_checkpointing: bool = False
 
     use_ScaleNorm: bool = False
     ScaleNorm_scale: float = 1.0

@@ -172,6 +172,11 @@ class AdapterTrainingArguments:
         metadata={"help": "If set, uses gradient checkpointing in adapter layers"}
     )
 
+    ttcore_checkpointing: bool = field(
+        default=False,
+        metadata={"help": "If set, uses gradient checkpointing after each ttcore inside TTLinear layer"}
+    )
+
     auto_shape_mode: str = field(
         default='ascending',
         metadata={"help": "shape factorization mode"}
