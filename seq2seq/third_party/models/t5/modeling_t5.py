@@ -414,6 +414,7 @@ class TTLoRALinear(nn.Linear, LoRALayer):
         tt_d = kwargs.pop('tt_d', 3)
         init_mode = kwargs.pop('init_mode', None)
         naive = kwargs.pop('naive', False)
+        ttcore_checkpointing = kwargs.pop('ttcore_checkpointing', False)
         nn.Linear.__init__(self, in_features, out_features, **kwargs)
         LoRALayer.__init__(self, r=r, lora_alpha=lora_alpha, lora_dropout=lora_dropout,
                            merge_weights=merge_weights)
@@ -426,7 +427,8 @@ class TTLoRALinear(nn.Linear, LoRALayer):
                 tt_rank=r,
                 bias=False,
                 init_mode=init_mode,
-                naive=naive
+                naive=naive,
+                ttcore_checkpointing=ttcore_checkpointing
             )
             self.scaling = self.lora_alpha / self.r
             # Freezing the pre-trained weight matrix
