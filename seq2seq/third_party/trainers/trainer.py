@@ -108,7 +108,7 @@ from transformers.trainer_utils import (
 )
 from transformers.training_args import ParallelMode, TrainingArguments
 from transformers.utils import logging
-from transformers.utils.modeling_auto_mapping import MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES
+#from transformers.utils.modeling_auto_mapping import MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES
 
 
 _is_torch_generator_available = False
