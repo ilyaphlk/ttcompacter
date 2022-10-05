@@ -27,7 +27,7 @@ from transformers.integrations import (  # isort: split
     run_hp_search_optuna,
     run_hp_search_ray,
     #deepspeed_init,
-    is_deepspeed_zero3_enabled,
+    #is_deepspeed_zero3_enabled,
 )
 
 import numpy as np
