@@ -46,7 +46,7 @@ def setup_package():
         #'ttpy==1.2.1',
         #'torch==1.8.0+cu111',
         #'torch==1.8.0',
-        'transformers>=4.6.0'
+        'transformers==4.22.2'
       ],
   )
 
