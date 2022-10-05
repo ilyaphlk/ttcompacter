@@ -527,10 +527,12 @@ class T5DenseReluDense(nn.Module):
         if self.use_TTLoRA:
             self.wi = TTLoRALinear(config.d_model, config.d_ff,
                 bias=False, r=adapter_config.tt_rank, tt_d=adapter_config.tt_d,
-                init_mode=adapter_config.TTLoRA_init, naive=adapter_config.naive)
+                init_mode=adapter_config.TTLoRA_init, naive=adapter_config.naive,
+                ttcore_checkpointing=adapter_config.ttcore_checkpointing)
             self.wo = TTLoRALinear(config.d_ff, config.d_model,
                 bias=False, r=adapter_config.tt_rank, tt_d=adapter_config.tt_d,
-                init_mode=adapter_config.TTLoRA_init, naive=adapter_config.naive)
+                init_mode=adapter_config.TTLoRA_init, naive=adapter_config.naive,
+                ttcore_checkpointing=adapter_config.ttcore_checkpointing)
         elif self.use_LoRA:
             self.wi = LoRALinear(config.d_model, config.d_ff, bias=False, r=adapter_config.tt_rank)
             self.wo = LoRALinear(config.d_ff, config.d_model, bias=False, r=adapter_config.tt_rank)
@@ -623,10 +625,12 @@ class T5Attention(nn.Module):
         if self.use_TTLoRA:
             self.q = TTLoRALinear(config.d_model, self.inner_dim,
                 bias=False, r=adapter_config.tt_rank, tt_d=adapter_config.tt_d,
-                init_mode=adapter_config.TTLoRA_init, naive=adapter_config.naive)
+                init_mode=adapter_config.TTLoRA_init, naive=adapter_config.naive,
+                ttcore_checkpointing=adapter_config.ttcore_checkpointing)
             self.v = TTLoRALinear(config.d_model, self.inner_dim,
                 bias=False, r=adapter_config.tt_rank, tt_d=adapter_config.tt_d,
-                init_mode=adapter_config.TTLoRA_init, naive=adapter_config.naive)
+                init_mode=adapter_config.TTLoRA_init, naive=adapter_config.naive,
+                ttcore_checkpointing=adapter_config.ttcore_checkpointing)
         elif self.use_LoRA:
             self.q = LoRALinear(config.d_model, self.inner_dim, bias=False, r=adapter_config.tt_rank)
             self.v = LoRALinear(config.d_model, self.inner_dim, bias=False, r=adapter_config.tt_rank)
