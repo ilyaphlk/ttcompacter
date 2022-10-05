@@ -46,7 +46,7 @@ from transformers.file_utils import (
     replace_return_docstrings,
 )
 from transformers.generation_utils import GenerationMixin
-from transformers.integrations import deepspeed_config, is_deepspeed_zero3_enabled
+#from transformers.integrations import deepspeed_config, is_deepspeed_zero3_enabled
 from transformers.utils import logging
 
 _init_weights = True
@@ -2198,19 +2198,19 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
 
         config.name_or_path = pretrained_model_name_or_path
 
-        # Instantiate model.
-        if is_deepspeed_zero3_enabled():
-            import deepspeed
-
-            logger.info("Detected DeepSpeed ZeRO-3: activating zero.init() for this model")
-            # this immediately partitions the model across all gpus, to avoid the overhead in time
-            # and memory copying it on CPU or each GPU first
-            with deepspeed.zero.Init(config=deepspeed_config()):
-                with no_init_weights(_enable=_fast_init):
-                    model = cls(config, *model_args, **model_kwargs)
-        else:
-            with no_init_weights(_enable=_fast_init):
-                model = cls(config, *model_args, **model_kwargs)
+        # # Instantiate model.
+        # if is_deepspeed_zero3_enabled():
+        #     import deepspeed
+        #
+        #     logger.info("Detected DeepSpeed ZeRO-3: activating zero.init() for this model")
+        #     # this immediately partitions the model across all gpus, to avoid the overhead in time
+        #     # and memory copying it on CPU or each GPU first
+        #     with deepspeed.zero.Init(config=deepspeed_config()):
+        #         with no_init_weights(_enable=_fast_init):
+        #             model = cls(config, *model_args, **model_kwargs)
+        # else:
+        with no_init_weights(_enable=_fast_init):
+            model = cls(config, *model_args, **model_kwargs)
 
         if from_tf:
             print("FROM TF")
