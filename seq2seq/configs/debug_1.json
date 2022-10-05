@@ -35,9 +35,9 @@
 "eval_dataset_name": "mrpc", 
 "test_dataset_name": "mrpc",
 "num_train_epochs": 2,
-"logging_steps":30,
+"logging_steps":15,
 "learning_rate": 3e-4,
-"warmup_steps": 500,
+"warmup_steps": 100,
 "per_device_train_batch_size": 25,
 "per_device_eval_batch_size": 50,
 "max_source_length": 128,
@@ -57,10 +57,12 @@
 "use_TTBias": false,
 
 
-"experiment_name": "tt_d3_r1",
+"experiment_name": "lora_d3_r1",
 "tt_rank": 1,
 "tt_d": 3,
-"use_LoRA": false,
+"use_checkpointing": false,
+"ttcore_checkpointing": false,
+"use_LoRA": true,
 "use_TTLoRA": false,
 "TTLoRA_init": "kaiming_zero"
 }

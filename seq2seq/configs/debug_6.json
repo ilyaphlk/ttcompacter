@@ -57,11 +57,11 @@
 "use_TTBias": false,
 
 
-"experiment_name": "ttlora_ttchkp_d3_r1",
+"experiment_name": "ttlora_d3_r1",
 "tt_rank": 1,
 "tt_d": 3,
 "use_checkpointing": false,
-"ttcore_checkpointing": true,
+"ttcore_checkpointing": false,
 "use_LoRA": false,
 "use_TTLoRA": true,
 "TTLoRA_init": "kaiming_zero"
