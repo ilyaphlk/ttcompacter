@@ -46,8 +46,13 @@ from transformers.file_utils import (
     replace_return_docstrings,
 )
 from transformers.generation_utils import GenerationMixin
-#from transformers.integrations import deepspeed_config, is_deepspeed_zero3_enabled
+# from transformers.integrations import deepspeed_config, is_deepspeed_zero3_enabled
 from transformers.utils import logging
+
+try:
+    import ttpy
+except:
+    print("Can't load ttpy - loading pretrained weights into ttpy is not available.")
 
 _init_weights = True
 
@@ -2261,7 +2266,7 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                     )
 
             model, missing_keys, unexpected_keys, error_msgs = cls._load_state_dict_into_model(
-                model, state_dict, pretrained_model_name_or_path, _fast_init=_fast_init
+                model, state_dict, pretrained_model_name_or_path #, _fast_init=_fast_init
             )
 
             #sample_miss_key = 'decoder.block.1.layer.2.layer_norm.weight'
@@ -2275,7 +2280,7 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                             state_dict[k] = p
 
                 model, missing_keys, unexpected_keys, error_msgs = cls._load_state_dict_into_model(
-                    model, state_dict, pretrained_model_name_or_path, _fast_init=_fast_init
+                    model, state_dict, pretrained_model_name_or_path #, _fast_init=_fast_init
                 )
 
             
@@ -2301,7 +2306,7 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                         state_dict[nk] = p
 
                 model, missing_keys, unexpected_keys, error_msgs = cls._load_state_dict_into_model(
-                    model, state_dict, pretrained_model_name_or_path, _fast_init=_fast_init
+                    model, state_dict, pretrained_model_name_or_path #, _fast_init=_fast_init
                 )
 
                 if save_state_dict:
