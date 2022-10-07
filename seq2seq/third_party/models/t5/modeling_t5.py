@@ -2265,12 +2265,14 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
                         "If you tried to load a PyTorch model from a TF 2.0 checkpoint, please set from_tf=True. "
                     )
 
-            #model, missing_keys, unexpected_keys, error_msgs = cls._load_state_dict_into_model(
-            error_msgs = cls._load_state_dict_into_model(
+            model, missing_keys, unexpected_keys, error_msgs, unk_obj = cls._load_state_dict_into_model(
+            #error_msgs = cls._load_state_dict_into_model(
                 model, state_dict, pretrained_model_name_or_path #, _fast_init=_fast_init
             )
-            print("error_msgs len:", len(error_msgs))
-            print("error msgs:", error_msgs)
+            print("missing keys:", missing_keys)
+            print("unexpected_keys:", unexpected_keys)
+            print("error_msgs:", error_msgs)
+            print("unk_obj:", unk_obj)
 
             #sample_miss_key = 'decoder.block.1.layer.2.layer_norm.weight'
             #print("before init\n", model.state_dict()[sample_miss_key])
