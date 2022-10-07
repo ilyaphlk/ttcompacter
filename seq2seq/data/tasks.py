@@ -79,7 +79,7 @@ class AbstractTask(abc.ABC):
         return dataset.select(indices)
 
     def load_dataset(self, split: int):
-        return datasets.load_dataset(self.name, self.config, split=split, script_version="master")
+        return datasets.load_dataset(self.name, self.config, split=split)#, script_version="master")
 
     def get_split_indices(self, split, dataset, validation_size):
         indices = self.shuffled_indices(dataset)
@@ -144,7 +144,7 @@ class MRPC(AbstractTask):
                            "test": "validation"}
 
     def load_dataset(self, split):
-        return datasets.load_dataset('glue', 'mrpc', split=split, script_version="master")
+        return datasets.load_dataset('glue', 'mrpc', split=split)#, script_version="master")
 
     def preprocessor(self, example, add_prefix=True):
         src_texts = ["sentence1:", example['sentence1'],
