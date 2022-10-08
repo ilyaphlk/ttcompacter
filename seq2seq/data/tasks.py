@@ -91,8 +91,8 @@ class AbstractTask(abc.ABC):
     def map_dataset(self, dataset, add_prefix):
         print(dataset.column_names)
         print(add_prefix)
-        return dataset.map(functools.partial(self.preprocessor, add_prefix=add_prefix))#,
-                           #remove_columns=dataset.column_names)
+        return dataset.map(functools.partial(self.preprocessor, add_prefix=add_prefix),
+                           remove_columns=["idx"])
 
     def get(self, split, add_prefix=True, n_obs=None, split_validation_test=False):
         # For small datasets (n_samples < 10K) without test set, we divide validation set to
