@@ -88,9 +88,11 @@ class AbstractTask(abc.ABC):
         else:
             return indices[validation_size:]
         
-    def map_dataset(self, dataset, add_prefix):    
-        return dataset.map(functools.partial(self.preprocessor, add_prefix=add_prefix),
-                           remove_columns=dataset.column_names)
+    def map_dataset(self, dataset, add_prefix):
+        print(dataset.column_names)
+        print(add_prefix)
+        return dataset.map(functools.partial(self.preprocessor, add_prefix=add_prefix))#,
+                           #remove_columns=dataset.column_names)
 
     def get(self, split, add_prefix=True, n_obs=None, split_validation_test=False):
         # For small datasets (n_samples < 10K) without test set, we divide validation set to
@@ -122,7 +124,7 @@ class Squad(AbstractTask):
     metric = [metrics.squad]
 
     def load_dataset(self, split):
-        return datasets.load_dataset(self.name, split=split, script_version="master")
+        return datasets.load_dataset(self.name, split=split)#, script_version="master")
 
     def preprocessor(self, example, add_prefix):
         answer = pad_punctuation(example['answers']['text'][0])
@@ -164,7 +166,7 @@ class COLA(AbstractTask):
 
     def load_dataset(self, split):
         return datasets.load_dataset('glue', 'cola',
-                                     split=split, script_version="master")
+                                     split=split)#, script_version="master")
 
     def preprocessor(self, example, add_prefix=True):
         src_texts = ["sentence:", example['sentence']]
