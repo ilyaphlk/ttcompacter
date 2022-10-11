@@ -579,16 +579,18 @@ def main():
             checkpoint = last_checkpoint
 
         if training_args.compute_time:
-            torch.cuda.synchronize()  # wait for move to complete
-            start = torch.cuda.Event(enable_timing=True)
-            end = torch.cuda.Event(enable_timing=True)
+            if torch.cuda.is_available():
+                torch.cuda.synchronize()  # wait for move to complete
+                start = torch.cuda.Event(enable_timing=True)
+                end = torch.cuda.Event(enable_timing=True)
             start.record()
         
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
         
         if training_args.compute_time:
             end.record()
-            torch.cuda.synchronize()  # wait for all_reduce to complete
+            if torch.cuda.is_available():
+                torch.cuda.synchronize()  # wait for all_reduce to complete
             total_time = start.elapsed_time(end)/(1000*60)
             performance_metrics.update({"total_time in minutes ": total_time})
         
