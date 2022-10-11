@@ -2512,10 +2512,10 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
         if encoder_outputs is None:
             # Convert encoder inputs in embeddings if needed
             encoder_outputs = self.encoder(
-                input_ids=input_ids.cuda() if torch.cuda.is_available() and input_ids is not None else input_ids,
-                attention_mask=attention_mask.cuda() if torch.cuda.is_available() and attention_mask is not None else input_ids,
-                inputs_embeds=inputs_embeds.cuda() if torch.cuda.is_available() and inputs_embeds is not None else input_ids,
-                head_mask=head_mask.cuda() if torch.cuda.is_available() and head_mask is not None else input_ids,
+                input_ids=input_ids,#.cuda() if torch.cuda.is_available() and input_ids is not None else input_ids,
+                attention_mask=attention_mask,#.cuda() if torch.cuda.is_available() and attention_mask is not None else input_ids,
+                inputs_embeds=inputs_embeds,#.cuda() if torch.cuda.is_available() and inputs_embeds is not None else input_ids,
+                head_mask=head_mask,#.cuda() if torch.cuda.is_available() and head_mask is not None else input_ids,
                 output_attentions=output_attentions,
                 output_hidden_states=output_hidden_states,
                 return_dict=return_dict,
@@ -2560,9 +2560,9 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
 
         # Decode
         decoder_outputs = self.decoder(
-            input_ids=decoder_input_ids.cuda() if torch.cuda.is_available() and decoder_input_ids is not None else input_ids,
-            attention_mask=decoder_attention_mask.cuda() if torch.cuda.is_available() and decoder_attention_mask is not None else input_ids,
-            inputs_embeds=decoder_inputs_embeds.cuda() if torch.cuda.is_available() and decoder_inputs_embeds is not None else input_ids,
+            input_ids=decoder_input_ids,#.cuda() if torch.cuda.is_available() and decoder_input_ids is not None else input_ids,
+            attention_mask=decoder_attention_mask,#.cuda() if torch.cuda.is_available() and decoder_attention_mask is not None else input_ids,
+            inputs_embeds=decoder_inputs_embeds,#.cuda() if torch.cuda.is_available() and decoder_inputs_embeds is not None else input_ids,
             past_key_values=past_key_values,
             encoder_hidden_states=hidden_states,
             encoder_attention_mask=attention_mask,
