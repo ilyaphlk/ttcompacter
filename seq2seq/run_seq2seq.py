@@ -455,7 +455,7 @@ def main():
         model_inputs["extra_fields"] = examples['extra_fields']
         return model_inputs
 
-    column_names = ['source', 'target']#, 'extra_fields']
+    column_names = ['source', 'target', 'extra_fields']
     performance_metrics = {}
     if training_args.do_train:
         train_datasets = [AutoTask.get(dataset_name,

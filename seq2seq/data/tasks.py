@@ -43,13 +43,13 @@ class AbstractTask(abc.ABC):
                        targets: List[str],
                        add_prefix: bool=False,
                        prefix: str=None,
-                       extra_fields={}):
+                       extra_fields=None):
         src_prefix = self.name if prefix is None else prefix
         sources = [src_prefix]+sources if add_prefix else sources
         return {'source': ' '.join(sources),
                 'target': ' '.join(targets),
-                'task': self.name,}
-                #'extra_fields': extra_fields}
+                'task': self.name,
+                'extra_fields': extra_fields}
 
     def check_n_obs(self, n_obs, total_size):
         if n_obs is not None and n_obs > total_size:
@@ -92,7 +92,7 @@ class AbstractTask(abc.ABC):
         print(dataset.column_names)
         print(add_prefix)
         return dataset.map(functools.partial(self.preprocessor, add_prefix=add_prefix),
-                           remove_columns=["idx"])
+                           remove_columns=dataset.column_names)
 
     def get(self, split, add_prefix=True, n_obs=None, split_validation_test=False):
         # For small datasets (n_samples < 10K) without test set, we divide validation set to
@@ -153,7 +153,8 @@ class MRPC(AbstractTask):
         src_texts = ["sentence1:", example['sentence1'],
                      "sentence2:", example["sentence2"]]
         tgt_texts = [str(example['label'])]
-        return self.seq2seq_format(src_texts, tgt_texts, add_prefix)
+        extra_fields = {'idx': example['idx']}
+        return self.seq2seq_format(src_texts, tgt_texts, add_prefix, extra_fields=extra_fields)
 
 
 class COLA(AbstractTask):
@@ -186,12 +187,13 @@ class SST2(AbstractTask):
 
     def load_dataset(self, split):
         return datasets.load_dataset('glue', 'sst2',
-                                     split=split, script_version="master")
+                                     split=split)#, script_version="master")
 
     def preprocessor(self, example, add_prefix=True):
         src_texts = ["sentence:", example['sentence']]
         tgt_texts = [str(example['label'])]
-        return self.seq2seq_format(src_texts, tgt_texts, add_prefix)
+        extra_fields = {'idx': example['idx']}
+        return self.seq2seq_format(src_texts, tgt_texts, add_prefix, extra_fields=extra_fields)
 
 
 class STSB(AbstractTask):
@@ -205,13 +207,14 @@ class STSB(AbstractTask):
 
     def load_dataset(self, split):
         return datasets.load_dataset('glue', 'stsb',
-                                     split=split, script_version="master")
+                                     split=split)#, script_version="master")
 
     def preprocessor(self, example, add_prefix=True):
         src_texts = ["sentence1:", example['sentence1'],
                      "sentence2:", example["sentence2"]]
         tgt_texts = [str(round_stsb_target(example['label']))]
-        return self.seq2seq_format(src_texts, tgt_texts, add_prefix)
+        extra_fields = {'idx': example['idx']}
+        return self.seq2seq_format(src_texts, tgt_texts, add_prefix, extra_fields=extra_fields)
 
 
 class QQP(AbstractTask):
@@ -225,13 +228,14 @@ class QQP(AbstractTask):
 
     def load_dataset(self, split):
         return datasets.load_dataset('glue', 'qqp',
-                                     split=split, script_version="master")
+                                     split=split)#, script_version="master")
 
     def preprocessor(self, example, add_prefix=True):
         src_texts = ["question1:", example['question1'],
                      "question2:", example["question2"]]
         tgt_texts = [str(example['label'])]
-        return self.seq2seq_format(src_texts, tgt_texts, add_prefix)
+        extra_fields = {'idx': example['idx']}
+        return self.seq2seq_format(src_texts, tgt_texts, add_prefix, extra_fields=extra_fields)
 
 
 class MNLI(AbstractTask):
@@ -245,13 +249,14 @@ class MNLI(AbstractTask):
 
 
     def load_dataset(self, split):
-        return datasets.load_dataset('glue', 'mnli', split=split, script_version="master")
+        return datasets.load_dataset('glue', 'mnli', split=split)#, script_version="master")
 
     def preprocessor(self, example, add_prefix=True):
         src_texts = ["premise:", example['premise'],
                      "hypothesis", example["hypothesis"]]
         tgt_texts = [str(example['label'])]
-        return self.seq2seq_format(src_texts, tgt_texts, add_prefix)
+        extra_fields = {'idx': example['idx']}
+        return self.seq2seq_format(src_texts, tgt_texts, add_prefix, extra_fields=extra_fields)
 
 
 class QNLI(AbstractTask):
@@ -264,13 +269,15 @@ class QNLI(AbstractTask):
                            "test": "validation"}
 
     def load_dataset(self, split):
-        return datasets.load_dataset('glue', 'qnli', split=split, script_version="master")
+        return datasets.load_dataset('glue', 'qnli', split=split)#, script_version="master")
 
     def preprocessor(self, example, add_prefix=True):
         src_texts = ["question:", example['question'],
                      "sentence:", example["sentence"]]
         tgt_texts = [str(example['label'])]
-        return self.seq2seq_format(src_texts, tgt_texts, add_prefix)
+        extra_fields = {'idx': example['idx']}
+        return self.seq2seq_format(src_texts, tgt_texts, add_prefix, extra_fields=extra_fields)
+
 
 class RTE(AbstractTask):
     name = "rte"
@@ -283,13 +290,14 @@ class RTE(AbstractTask):
 
     def load_dataset(self, split):
         return datasets.load_dataset('glue', 'rte',
-                                     split=split, script_version="master")
+                                     split=split)#, script_version="master")
 
     def preprocessor(self, example, add_prefix=True):
         src_texts = ["sentence1:", example['sentence1'],
                      "sentence2:", example["sentence2"]]
         tgt_texts = [str(example['label'])]
-        return self.seq2seq_format(src_texts, tgt_texts, add_prefix)
+        extra_fields = {'idx': example['idx']}
+        return self.seq2seq_format(src_texts, tgt_texts, add_prefix, extra_fields=extra_fields)
 
 
 class WNLI(AbstractTask):
@@ -302,13 +310,14 @@ class WNLI(AbstractTask):
                            "test": "validation"}
 
     def load_dataset(self, split):
-        return datasets.load_dataset('glue', 'wnli', split=split, script_version="master")
+        return datasets.load_dataset('glue', 'wnli', split=split)#, script_version="master")
 
     def preprocessor(self, example, add_prefix=True):
         src_texts = ["sentence1:", example['sentence1'],
                      "sentence2:", example["sentence2"]]
         tgt_texts = [str(example['label'])]
-        return self.seq2seq_format(src_texts, tgt_texts, add_prefix)
+        extra_fields = {'idx': example['idx']}
+        return self.seq2seq_format(src_texts, tgt_texts, add_prefix, extra_fields=extra_fields)
 
 
 class SuperGLUEBoolQ(AbstractTask):
