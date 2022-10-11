@@ -48,8 +48,8 @@ class AbstractTask(abc.ABC):
         sources = [src_prefix]+sources if add_prefix else sources
         return {'source': ' '.join(sources),
                 'target': ' '.join(targets),
-                'task': self.name,
-                'extra_fields': extra_fields}
+                'task': self.name,}
+                #'extra_fields': extra_fields}
 
     def check_n_obs(self, n_obs, total_size):
         if n_obs is not None and n_obs > total_size:
@@ -117,7 +117,8 @@ class AbstractTask(abc.ABC):
             # shuffles the data and samples it.
             if n_obs is not None:
                 dataset = self.subsample(dataset, n_obs)
-        return self.map_dataset(dataset, add_prefix)    
+        return self.map_dataset(dataset, add_prefix)
+
 
 class Squad(AbstractTask):
     name = "squad"
