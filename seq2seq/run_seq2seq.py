@@ -583,17 +583,17 @@ def main():
                 torch.cuda.synchronize()  # wait for move to complete
                 start = torch.cuda.Event(enable_timing=True)
                 end = torch.cuda.Event(enable_timing=True)
-            start.record()
+                start.record()
         
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
         
         if training_args.compute_time:
-            end.record()
             if torch.cuda.is_available():
+                end.record()
                 torch.cuda.synchronize()  # wait for all_reduce to complete
-            total_time = start.elapsed_time(end)/(1000*60)
-            performance_metrics.update({"total_time in minutes ": total_time})
-        
+                total_time = start.elapsed_time(end)/(1000*60)
+                performance_metrics.update({"total_time in minutes ": total_time})
+
         trainer.save_model()  # Saves the tokenizer too for easy upload
         train_metrics = train_result.metrics
         max_train_samples = (
