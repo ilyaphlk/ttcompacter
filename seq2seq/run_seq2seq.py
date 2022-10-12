@@ -382,8 +382,8 @@ def main():
         cache_dir=model_args.cache_dir,
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
-        gradient_checkpointing=adapter_args.use_checkpointing
     )
+    config.gradient_checkpointing = adapter_args.use_checkpointing
 
     config.train_task_adapters = adapter_args.train_task_adapters
     config.prefix_tuning = adapter_args.prefix_tuning
