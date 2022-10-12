@@ -57,8 +57,8 @@
 "use_TTBias": false,
 
 
-"experiment_name": "lora_chkp_d3_r4",
-"tt_rank": 4,
+"experiment_name": "lora_chkp_d3_r1",
+"tt_rank": 1,
 "tt_d": 3,
 "use_checkpointing": true,
 "ttcore_checkpointing": false,
