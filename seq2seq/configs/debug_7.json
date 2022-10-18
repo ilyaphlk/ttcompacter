@@ -57,7 +57,7 @@
 "use_TTBias": false,
 
 
-"experiment_name": "ttlora_chkp_naive_d3_r1",
+"experiment_name": "ttlora_sep_chkp_naive_d3_r1",
 "tt_rank": 1,
 "tt_d": 3,
 "naive": true,
@@ -65,5 +65,6 @@
 "ttcore_checkpointing": false,
 "use_LoRA": false,
 "use_TTLoRA": true,
+"ttlora_separate": true,
 "TTLoRA_init": "kaiming_zero"
 }
