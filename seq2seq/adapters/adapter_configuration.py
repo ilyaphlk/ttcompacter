@@ -81,6 +81,7 @@ class AdapterConfig(object):
     TTBias_rk: int = 2
 
     use_LoRA: bool = False
+    lora_dense: bool = False
     use_TTLoRA: bool = False
     TTLoRA_init: str = None
 

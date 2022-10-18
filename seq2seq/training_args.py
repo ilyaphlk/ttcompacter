@@ -232,6 +232,11 @@ class AdapterTrainingArguments:
         metadata={"help": "if set, use LoRA-style adapters"}
     )
 
+    lora_dense: bool = field(
+        default=False,
+        metadata={"help": "use regular linear layer as lora part for debugging purposes"}
+    )
+
     use_TTLoRA: bool = field(
         default=False,
         metadata={"help": "if set, use LoRA-style TT-adapters"}
