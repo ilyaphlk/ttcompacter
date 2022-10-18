@@ -471,7 +471,11 @@ class TTLoRALinear(nn.Linear, LoRALayer):
         nn.Linear.reset_parameters(self)
         if hasattr(self, 'lora_part'):
             # initialize A the same way as the default for nn.Linear and B to zero
-            self.lora_part.reset_parameters()
+            if isinstance(self.lora_part, torch.nn.Sequential):
+                self.lora_part[0].reset_parameters()
+                self.lora_part[1].reset_parameters()
+            else:
+                self.lora_part.reset_parameters()
 
     def train(self, mode: bool = True):
         nn.Linear.train(self, mode)
