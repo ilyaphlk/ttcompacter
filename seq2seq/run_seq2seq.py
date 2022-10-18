@@ -333,6 +333,7 @@ def main():
     run.config.use_LoRA = adapter_args.use_LoRA
     run.config.lora_dense = adapter_args.lora_dense
     run.config.use_TTLoRA = adapter_args.use_TTLoRA
+    run.config.ttlora_separate = adapter_args.ttlora_separate
     run.config.TTLoRA_init = adapter_args.TTLoRA_init
 
 

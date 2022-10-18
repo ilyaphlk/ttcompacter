@@ -83,6 +83,7 @@ class AdapterConfig(object):
     use_LoRA: bool = False
     lora_dense: bool = False
     use_TTLoRA: bool = False
+    ttlora_separate: bool = False
     TTLoRA_init: str = None
 
     factorize_smaller_dim: bool = True

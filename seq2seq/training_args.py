@@ -242,6 +242,11 @@ class AdapterTrainingArguments:
         metadata={"help": "if set, use LoRA-style TT-adapters"}
     )
 
+    ttlora_separate: bool = field(
+        default=False,
+        metadata={"help": "use TTlinear for LoraA and LoraB parts separately"}
+    )
+
     TTLoRA_init: str = field(
         default=None,
         metadata={"help": "if None, uses glorot initialization for TTLoRA. Kaiming imitates the LoRA initialization, described in the original paper, by initializing the first TTCore with Kaiming initialization"}
