@@ -36,9 +36,9 @@
 "num_train_epochs": 3,
 "evaluation_strategy": "steps",
 "eval_steps": 20,
-"logging_steps":10,
-"learning_rate": 3e-4,
-"warmup_steps": 500,
+"logging_steps": 10,
+"learning_rate": 3e-3,
+"warmup_steps": 100,
 "per_device_train_batch_size": 100,
 "per_device_eval_batch_size": 50,
 "max_source_length": 128,
@@ -58,7 +58,8 @@
 "use_TTBias": false,
 
 
-"experiment_name": "lora_r1",
+"experiment_name": "lora_r1_chk",
+"use_checkpointing": true,
 "tt_rank": 1,
 "tt_d": 3,
 "use_LoRA": true,
